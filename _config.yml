@@ -1,0 +1,43 @@
+title: Azhir
+tagline: "Notes & proofs"
+description: >-
+  Azhir's personal site and technical blog — notes on math, code,
+  and whatever else is worth writing down properly.
+url: "https://azhir.com"
+baseurl: ""
+
+author:
+  name: Azhir
+
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
+  input: GFM
+  syntax_highlighter: rouge
+
+permalink: /:year/:month/:day/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+collections:
+  posts:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+sass:
+  style: compressed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules
+  - vendor
