@@ -1,18 +1,33 @@
 ---
 ---
+/* =========================================================
+   FONTS
+   Fraunces  = display serif for the big italic title/headings
+               (has an "engraved atlas" feel at large sizes)
+   Literata  = body text serif, comfortable for long reading
+   IBM Plex Mono = used for dates, labels, code, nav — anything
+               that should feel like data/metadata rather than prose
+   ========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/* =========================================================
+   COLOR PALETTE (CSS custom properties / variables)
+   Used everywhere below via var(--name) instead of hardcoding
+   hex values, so the whole site's palette can be changed here.
+   ========================================================= */
 :root {
-  --paper: #F5F0E3;
-  --paper-line: #DED5BE;
-  --ink: #1B1A17;
-  --ink-soft: #5C564B;
-  --brass: #9C7A3C;
-  --navy: #1F3350;
-  --max-w: 700px;
+  --paper: #F5F0E3;       /* main background — warm parchment */
+  --paper-line: #DED5BE;  /* subtle dividing lines / borders */
+  --ink: #1B1A17;         /* primary text color — near-black */
+  --ink-soft: #5C564B;    /* secondary/muted text (dates, captions) */
+  --brass: #9C7A3C;       /* accent color — star-chart gold */
+  --navy: #1F3350;        /* accent color — used for links */
+  --max-w: 700px;         /* max content width, keeps lines readable */
 }
 
+/* Reset box-sizing so padding/border don't add to element width */
 * { box-sizing: border-box; }
+/* Smoother font rendering on WebKit browsers */
 html { -webkit-font-smoothing: antialiased; }
 
 body {
@@ -21,40 +36,53 @@ body {
   color: var(--ink);
   font-family: 'Literata', Georgia, serif;
   font-size: 18px;
-  line-height: 1.7;
+  line-height: 1.7; /* generous line spacing for readability */
 }
 
+/* Only animate color/opacity changes if the user hasn't requested
+   reduced motion (accessibility) */
 @media (prefers-reduced-motion: no-preference) {
   a, .post-item, .chart-dot { transition: color .15s ease, border-color .15s ease, opacity .3s ease; }
 }
 
+/* Centers all page content and caps its width */
 .wrap {
   max-width: var(--max-w);
   margin: 0 auto;
   padding: 3rem 1.5rem 6rem;
 }
 
-/* ---- Header / hero: star-chart signature ---- */
+/* =========================================================
+   HEADER / HERO
+   Contains: the constellation SVG graphic, coordinate tick text,
+   site title, tagline, and nav links.
+   ========================================================= */
 .site-header {
-  position: relative;
+  position: relative; /* lets the constellation SVG be absolutely
+                          positioned relative to this container */
   margin-bottom: 2.8rem;
   padding-bottom: 1.6rem;
   border-bottom: 1px solid var(--paper-line);
 }
 
+/* The constellation/star-chart SVG in the corner of the header */
 .chart-svg {
   position: absolute;
-  top: -18px;
-  right: -10px;
-  width: 220px;
-  height: 140px;
-  opacity: 0.55;
-  pointer-events: none;
+  top: -6px;
+  right: 0;
+  width: 150px;
+  height: 100px;
+  opacity: 0.55;       /* kept subtle so it doesn't compete with the title */
+  pointer-events: none; /* purely decorative, shouldn't intercept clicks */
+  color: var(--brass);  /* used by any child that references currentColor */
 }
-.chart-line { stroke: var(--brass); stroke-width: 1; opacity: 0.55; }
-.chart-dot { fill: var(--brass); }
-.chart-dot.bright { fill: var(--ink); }
+.chart-line { stroke: var(--brass); stroke-width: 1; opacity: 0.55; }  /* constellation lines */
+.chart-dot { fill: var(--brass); }        /* regular stars */
+.chart-dot.bright { fill: var(--ink); }   /* the one "bright" star (Azha) */
+.blossom-petal path { fill: var(--paper); } /* orange blossom petals, same color as page background */
 
+/* Small monospace line above the title showing RA/DEC coordinates
+   (Azha's real celestial coordinates) — a factual, "field notes" touch */
 .coord-tick {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.65rem;
@@ -64,19 +92,24 @@ body {
   margin: 0 0 0.6rem;
 }
 
+/* The big italic site title ("Azhir Mahmood") */
 .site-title {
   font-family: 'Fraunces', Georgia, serif;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(2.6rem, 8vw, 3.7rem);
+  /* clamp(min, preferred, max) — scales smoothly between screen sizes
+     instead of jumping at breakpoints */
+  font-size: clamp(2.2rem, 6.5vw, 3.1rem);
   letter-spacing: -0.01em;
   margin: 0 0 .1em;
   color: var(--ink);
   position: relative;
-  z-index: 1;
+  z-index: 1;           /* sits above the constellation SVG if they overlap */
+  max-width: 85%;        /* stops the title from running into the graphic */
 }
 .site-title a { color: inherit; text-decoration: none; }
 
+/* Small uppercase tagline under the title */
 .site-tagline {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.78rem;
@@ -86,22 +119,33 @@ body {
   margin: 0 0 1.5rem;
 }
 
+/* Nav links: Writing / About / RSS */
 .site-nav { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; }
-.site-nav a { color: var(--navy); text-decoration: none; margin-right: 1.3rem; padding-bottom: 2px; border-bottom: 1px solid transparent; }
-.site-nav a:hover { border-bottom-color: var(--navy); }
+.site-nav a {
+  color: var(--navy);
+  text-decoration: none;
+  margin-right: 1.3rem;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent; /* invisible until hover */
+}
+.site-nav a:hover { border-bottom-color: var(--navy); } /* underline reveals on hover */
 
+/* The highlighted equation/quote box on the homepage
+   (the "§ welcome := {...}" box) */
 .hero-mark {
   margin: 2.2rem 0 2.5rem;
   padding: 1.3rem 1.5rem;
-  border-left: 2px solid var(--brass);
-  background: rgba(156, 122, 60, 0.06);
+  border-left: 2px solid var(--brass); /* accent stripe on the left edge */
+  background: rgba(156, 122, 60, 0.06); /* faint brass tint background */
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.92rem;
   color: var(--ink-soft);
-  overflow-x: auto;
+  overflow-x: auto; /* lets long equations scroll on narrow screens */
 }
 
-/* ---- Post list: catalog style ---- */
+/* =========================================================
+   POST LIST (homepage) — styled like a numbered catalog
+   ========================================================= */
 .post-list { list-style: none; margin: 0; padding: 0; }
 
 .post-item {
@@ -112,28 +156,33 @@ body {
   align-items: baseline;
 }
 
+/* The "01", "02" etc. catalog number before each post title */
 .post-num {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
   color: var(--brass);
-  flex-shrink: 0;
+  flex-shrink: 0;  /* keeps the number from getting squeezed on narrow screens */
   width: 3.2rem;
 }
 
 .post-item a { color: var(--ink); text-decoration: none; font-weight: 500; }
 .post-item a:hover { color: var(--navy); }
 
+/* Date shown at the right edge of each post row */
 .post-date {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
   color: var(--ink-soft);
-  margin-left: auto;
+  margin-left: auto; /* pushes the date to the far right in the flex row */
   white-space: nowrap;
 }
 
-/* ---- Single post ---- */
+/* =========================================================
+   SINGLE POST PAGE
+   ========================================================= */
 .post-header { margin-bottom: 2rem; }
 
+/* Small label above the post title showing the date/tags */
 .post-eyebrow {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
@@ -150,6 +199,7 @@ body {
   line-height: 1.2;
 }
 
+/* Sub-headings (##) inside post body content */
 .post-content h2 {
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 600;
@@ -159,22 +209,27 @@ body {
 
 .post-content p { margin: 1.1em 0; }
 
+/* Inline code and code blocks use the monospace font */
 .post-content code, .post-content pre { font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; }
 
+/* Multi-line code blocks — dark background, light text (inverted from page) */
 .post-content pre {
   background: var(--ink);
   color: var(--paper);
   padding: 1rem 1.2rem;
-  overflow-x: auto;
+  overflow-x: auto;    /* horizontal scroll for long lines instead of wrapping */
   border-radius: 2px;
 }
-.post-content pre code { background: none; padding: 0; }
+.post-content pre code { background: none; padding: 0; } /* avoid double-styling code inside pre */
+
+/* Inline code (not inside a <pre> block) gets a subtle highlight instead */
 .post-content :not(pre) > code {
   background: rgba(31, 51, 80, 0.08);
   padding: 0.1em 0.35em;
   border-radius: 2px;
 }
 
+/* Blockquotes — used for asides/caveats in posts */
 .post-content blockquote {
   margin: 1.4em 0;
   padding-left: 1.1em;
@@ -183,9 +238,14 @@ body {
   font-style: italic;
 }
 
+/* MathJax-rendered display equations (block math) get breathing room
+   and can scroll horizontally if wider than the page */
 mjx-container[display="true"] { margin: 1.6em 0 !important; overflow-x: auto; }
 
-/* ---- About page ---- */
+/* =========================================================
+   ABOUT PAGE
+   ========================================================= */
+/* Circular placeholder avatar (shows "A") until a real photo is added */
 .about-photo-placeholder {
   width: 84px; height: 84px;
   border-radius: 50%;
@@ -198,7 +258,9 @@ mjx-container[display="true"] { margin: 1.6em 0 !important; overflow-x: auto; }
   margin-bottom: 1.2rem;
 }
 
-/* ---- Footer ---- */
+/* =========================================================
+   FOOTER
+   ========================================================= */
 .site-footer {
   margin-top: 4rem;
   padding-top: 1.5rem;
@@ -208,11 +270,15 @@ mjx-container[display="true"] { margin: 1.6em 0 !important; overflow-x: auto; }
   color: var(--ink-soft);
 }
 
+/* Visible focus outline for keyboard navigation (accessibility) */
 a:focus-visible, button:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 
+/* =========================================================
+   MOBILE ADJUSTMENTS (screens under 480px wide)
+   ========================================================= */
 @media (max-width: 480px) {
   body { font-size: 17px; }
   .wrap { padding: 2.2rem 1.2rem 4rem; }
-  .post-date { display: none; }
-  .chart-svg { width: 140px; height: 90px; top: -10px; }
+  .post-date { display: none; } /* hide dates on post list to save space */
+  .chart-svg { width: 140px; height: 90px; top: -10px; } /* shrink header graphic */
 }
