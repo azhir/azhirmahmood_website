@@ -1,4 +1,4 @@
-title: Azhir
+title: Azhir Mahmood
 tagline: "Field notes &middot; ML &amp; astrophysics"
 description: >-
   Azhir's personal site and technical blog — notes on math, code,
@@ -7,7 +7,7 @@ url: "https://azhirmahmood.com"
 baseurl: ""
 
 author:
-  name: Azhir
+  name: Azhir Mahmood
 
 markdown: kramdown
 kramdown:
