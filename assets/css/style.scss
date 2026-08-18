@@ -1,40 +1,165 @@
 ---
 ---
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/* ==========================================================
+   AZHIR — SITE STYLESHEET
+   ==========================================================
+
+   DESIGN SYSTEM
+
+   The site is deliberately restrained:
+
+     Paper      → warm manuscript background
+     Ink        → primary prose / headings
+     Ink soft   → metadata and secondary text
+     Brass      → astronomical / manuscript accents
+     Navy       → links and cool contrast
+
+   Typography:
+
+     Fraunces       → titles / display text
+     Literata       → long-form reading
+     IBM Plex Mono  → navigation, coordinates, metadata
+
+   The header has THREE independent layers:
+
+     1. .site-header background colour
+     2. .site-header::before decorative jali
+     3. .site-header-inner actual content
+
+   Keeping these separate is important:
+   changing the jali should NEVER alter the layout.
+   ========================================================== */
+
+
+/* ==========================================================
+   FONTS
+   ========================================================== */
+
+/*
+   Fraunces:
+     expressive editorial/display serif.
+
+   Literata:
+     designed for comfortable screen reading.
+
+   IBM Plex Mono:
+     provides the astronomical / technical voice.
+
+   If you ever self-host fonts, this @import can be replaced
+   with @font-face declarations.
+*/
+@import url(
+  'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap'
+);
+
+
+/* ==========================================================
+   GLOBAL DESIGN TOKENS
+   ========================================================== */
 
 :root {
+
+  /*
+     Main page background.
+     Slightly warm rather than pure white.
+  */
   --paper: #F5F0E3;
+
+  /*
+     Used for subtle horizontal rules and dividers.
+  */
   --paper-line: #DED5BE;
+
+  /*
+     Main text colour.
+     Near-black is softer than #000.
+  */
   --ink: #1B1A17;
+
+  /*
+     Secondary text:
+     metadata, coordinates, footer, etc.
+  */
   --ink-soft: #5C564B;
+
+  /*
+     Warm accent:
+     constellation, post numbers, tagline.
+  */
   --brass: #9C7A3C;
+
+  /*
+     Cool accent:
+     navigation and interactive elements.
+  */
   --navy: #1F3350;
+
+  /*
+     Primary reading-column width.
+
+     Increase this if you want wider articles.
+     For prose I would keep this around 680–740px.
+  */
   --max-w: 700px;
 }
 
 
+/* ==========================================================
+   BASIC RESET
+   ========================================================== */
+
+/*
+   Makes width calculations predictable:
+   padding and borders are included inside declared widths.
+*/
 * {
   box-sizing: border-box;
 }
 
 
+/*
+   Slightly improves font rendering on macOS/iOS.
+*/
 html {
   -webkit-font-smoothing: antialiased;
 }
 
 
+/* ==========================================================
+   PAGE
+   ========================================================== */
+
 body {
   margin: 0;
+
   background: var(--paper);
   color: var(--ink);
+
   font-family: 'Literata', Georgia, serif;
+
+  /*
+     Base reading size.
+     Most other text is specified relative to this.
+  */
   font-size: 18px;
   line-height: 1.7;
 }
 
 
+/* ==========================================================
+   SUBTLE INTERACTION ANIMATION
+   ========================================================== */
+
+/*
+   Only enable transitions when the user's OS has NOT asked
+   for reduced motion.
+
+   This makes hover/visual changes feel softer while respecting
+   accessibility preferences.
+*/
 @media (prefers-reduced-motion: no-preference) {
+
   a,
   .post-item,
   .chart-dot {
@@ -46,128 +171,204 @@ body {
 }
 
 
+/* ==========================================================
+   MAIN READING COLUMN
+   ========================================================== */
+
 .wrap {
   max-width: var(--max-w);
   margin: 0 auto;
+
+  /*
+     top | horizontal | bottom
+
+     Bottom is deliberately generous because the page benefits
+     from some manuscript-like empty paper.
+  */
   padding: 3rem 1.5rem 6rem;
 }
 
 
 /* ==========================================================
-   HEADER / HERO
+   HEADER / MASTHEAD
    ========================================================== */
 
-// .site-header {
-//   position: relative;
-//   margin-bottom: 1rem;
-//   padding: 2.0rem 0 1.2rem;
-//   border-bottom: 1px solid var(--paper-line);
-//   background-color: var(--paper);
-//   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpolygon points='50,30 53.06,42.61 64.14,35.86 57.39,46.94 70,50 57.39,53.06 64.14,64.14 53.06,57.39 50,70 46.94,57.39 35.86,64.14 42.61,53.06 30,50 42.61,46.94 35.86,35.86 46.94,42.61' fill='none' stroke='%239C7A3C' stroke-opacity='0.14' stroke-width='1'/%3E%3Cg stroke='%231F3350' stroke-opacity='0.08' stroke-width='0.8' fill='none'%3E%3Cpolygon points='0,-14 14,0 0,14 -14,0' transform='translate(0,0)'/%3E%3Cpolygon points='0,-14 14,0 0,14 -14,0' transform='translate(100,0)'/%3E%3Cpolygon points='0,-14 14,0 0,14 -14,0' transform='translate(0,100)'/%3E%3Cpolygon points='0,-14 14,0 0,14 -14,0' transform='translate(100,100)'/%3E%3C/g%3E%3C/svg%3E");
-//   background-repeat: repeat;
-// }
+/*
+   IMPORTANT:
 
+   The decorative jali is NOT a normal background image here.
 
-
-// .site-header {
-//   position: relative;
-//   margin-bottom: 1rem;
-//   padding: 2rem 0 1.2rem;
-//   border-bottom: 1px solid var(--paper-line);
-
-//   background-color: var(--paper);
-//   background-image: url("../images/jali_stars.svg");
-//   background-repeat: repeat;
-//   background-size: 360px 360px;
-//   background-position: 0 0;
-//   // background-position: left top;
-// }
-
-
-// /*
-//    The text stays on the left.
-
-//    The SVG is a fixed-width flex item and margin-left:auto
-//    pushes it naturally toward the right edge.
-
-//    No translateX.
-//    No negative positioning.
-//    No CSS aspect-ratio.
-// */
-// .site-header-inner {
-//   width: 100%;
-//   max-width: 2300px;
-
-//   margin: 0 auto;
-//   padding: 0 2rem;
-
-//   display: flex;
-//   align-items: flex-end;
-//   flex-wrap: nowrap;
-//   gap: 2rem;
-
-//   // position: relative;
-//   // z-index: 1;
-// }
-
-
-// .site-header-content {
-//   flex: 0 0 auto;
-//   position: relative;
-//   z-index: 2;
-// }
-
-
-
-
+   It lives on .site-header::before so its opacity can be
+   adjusted independently of the text and constellation.
+*/
 .site-header {
   position: relative;
+
   margin-bottom: 1rem;
+
+  /*
+     Vertical size of the masthead.
+     Increase the first value for more space above/below.
+  */
   padding: 2rem 0 1.2rem;
+
   border-bottom: 1px solid var(--paper-line);
+
   background-color: var(--paper);
+
+  /*
+     Prevent decorative background geometry from extending
+     outside the header.
+  */
   overflow: hidden;
 }
 
+
+/* ==========================================================
+   JALI BACKGROUND
+   ========================================================== */
+
 .site-header::before {
   content: "";
+
+  /*
+     Fill the complete header without influencing layout.
+  */
   position: absolute;
   inset: 0;
 
+  /*
+     SVG location relative to:
+       assets/css/style.scss
+
+     SVG should therefore live at:
+       assets/images/jali_stars.svg
+  */
   background-image: url("../images/jali_stars.svg");
+
+  /*
+     Tile the geometry indefinitely.
+  */
   background-repeat: repeat;
+
+  /*
+     MAIN JALI SCALE CONTROL.
+
+     Larger number:
+       → larger motifs
+       → calmer / more architectural
+
+     Smaller number:
+       → more repetitions
+       → denser / more textile-like
+
+     Suggested useful range:
+       320px → dense
+       380px → current balance
+       420px → large / spacious
+
+     `auto` is important because it preserves the SVG's
+     original aspect ratio.
+  */
   background-size: 380px auto;
+
+  /*
+     Start the tile from the top-left.
+     Keeping this predictable makes seamless repeats easier
+     to reason about.
+  */
   background-position: 0 0;
 
+  /*
+     MAIN JALI VISIBILITY CONTROL.
+
+     Suggested range:
+       0.015 → extremely faint
+       0.025 → current
+       0.035 → clearly visible
+       0.050 → relatively strong
+
+     Do NOT put opacity on .site-header itself, because that
+     would fade the text and constellation too.
+  */
   opacity: 0.025;
+
+  /*
+     Decorative layer should never intercept clicks.
+  */
   pointer-events: none;
 }
 
+
+/* ==========================================================
+   HEADER LAYOUT
+   ========================================================== */
+
+/*
+   This holds BOTH:
+
+     left  → title / tagline / navigation
+     right → constellation chart
+
+   The jali is underneath both.
+*/
 .site-header-inner {
   position: relative;
+
+  /*
+     Places actual header content above ::before.
+  */
   z-index: 1;
 
   width: 100%;
+
+  /*
+     Very large upper limit so the header can breathe on
+     wide displays without unnecessarily constraining the
+     constellation.
+
+     The normal page body remains only 700px wide.
+  */
   max-width: 2300px;
+
   margin: 0 auto;
+
+  /*
+     Distance from browser/window edges.
+  */
   padding: 0 2rem;
 
+  /*
+     Text and constellation share one horizontal row.
+  */
   display: flex;
+
+  /*
+     Align both pieces toward their lower edges.
+  */
   align-items: flex-end;
+
+  /*
+     Prevent chart from unexpectedly dropping underneath
+     the title at desktop widths.
+  */
   flex-wrap: nowrap;
 }
 
+
+/*
+   Left-hand masthead content.
+
+   `flex: 0 0 auto` means:
+     do not grow
+     do not shrink
+     use natural content width
+*/
 .site-header-content {
   position: relative;
   z-index: 2;
-  flex: 0 0 auto;
-}
 
-.chart-svg {
   flex: 0 0 auto;
-  width: 520px;
-  height: auto;
-  margin-left: auto;
 }
 
 
@@ -175,33 +376,62 @@ body {
    STAR CHART
    ========================================================== */
 
-.chart-svg {
-  /*
-     Fixed visual width.
+/*
+   NOTE:
 
-     The SVG viewBox in header.html already preserves the
-     220 × 160 proportions, so no aspect-ratio declaration
-     is necessary.
+   There used to be TWO .chart-svg definitions in this file.
+
+   Keep only this one.
+
+   The SVG itself uses a viewBox, so the celestial geometry
+   remains internally scalable.
+*/
+.chart-svg {
+
+  /*
+     Reserve a fixed horizontal region in the flex row.
   */
   flex: 0 0 450px;
+
   width: 450px;
   max-width: 450px;
+
+  /*
+     Visual chart height.
+
+     Because this is a decorative SVG with a viewBox,
+     this value is primarily compositional.
+  */
   height: 180px;
+
+  /*
+     Push constellation as far right as available space allows.
+  */
   margin-left: auto;
+
   display: block;
+
+  /*
+     Decorative chart should not consume mouse/touch events.
+  */
   pointer-events: none;
+
+  /*
+     Allows labels/glows to extend slightly beyond SVG edges.
+  */
   overflow: visible;
-  // transform: translateX(-150px);
+
+  /*
+     `currentColor` inside the SVG can inherit this brass tone.
+  */
   color: var(--brass);
 }
 
 
+/* ==========================================================
+   CONSTELLATION LINE
+   ========================================================== */
 
-/*
-   The river is intentionally softer than Azha.
-   Azha itself gets its emphasis from the larger blossom and
-   stronger label inside header.html.
-*/
 .chart-line {
   fill: none;
 
@@ -211,33 +441,51 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
 
+  /*
+     River remains quieter than the highlighted Azha blossom.
+  */
   opacity: 0.64;
 }
 
+
+/* ==========================================================
+   CONSTELLATION STARS
+   ========================================================== */
 
 .chart-dot {
   fill: var(--brass);
 }
 
 
+/*
+   Optional class if a particular star should become much
+   darker / stronger.
+*/
 .chart-dot.bright {
   fill: var(--ink);
 }
 
 
+/*
+   Tiny decorative background field stars.
+*/
 .chart-field circle {
   fill: var(--brass);
   opacity: 0.26;
 }
 
 
+/*
+   Azha blossom petals use the page colour so that the flower
+   appears partially cut from / integrated with the paper.
+*/
 .blossom-petal path {
   fill: var(--paper);
 }
 
 
 /* ==========================================================
-   HEADER TYPOGRAPHY
+   HEADER — COORDINATE LINE
    ========================================================== */
 
 .coord-tick {
@@ -245,6 +493,10 @@ body {
 
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.65rem;
+
+  /*
+     Small spacing gives this a catalogue / atlas feel.
+  */
   letter-spacing: 0.04em;
 
   color: var(--ink-soft);
@@ -252,18 +504,31 @@ body {
 }
 
 
+/* ==========================================================
+   HEADER — SITE TITLE
+   ========================================================== */
+
 .site-title {
   margin: 0 0 .1em;
 
   font-family: 'Fraunces', Georgia, serif;
   font-style: italic;
   font-weight: 500;
+
   font-size: 2.6rem;
 
+  /*
+     Slight negative tracking suits large Fraunces display type.
+  */
   letter-spacing: -0.01em;
 
   color: var(--ink);
 
+  /*
+     Prevent the name splitting across lines on normal desktop.
+
+     Mobile handling occurs later in the stylesheet.
+  */
   white-space: nowrap;
 }
 
@@ -273,6 +538,10 @@ body {
   text-decoration: none;
 }
 
+
+/* ==========================================================
+   HEADER — TAGLINE
+   ========================================================== */
 
 .site-tagline {
   margin: 0 0 1.5rem;
@@ -287,6 +556,10 @@ body {
 }
 
 
+/* ==========================================================
+   HEADER — NAVIGATION
+   ========================================================== */
+
 .site-nav {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
@@ -294,12 +567,22 @@ body {
 
 
 .site-nav a {
+  /*
+     Horizontal spacing between Writing / About / RSS.
+  */
   margin-right: 1.3rem;
+
+  /*
+     Gives hover underline some breathing room.
+  */
   padding-bottom: 2px;
 
   color: var(--navy);
   text-decoration: none;
 
+  /*
+     Reserve underline space even before hover so nothing moves.
+  */
   border-bottom: 1px solid transparent;
 }
 
@@ -310,37 +593,70 @@ body {
 
 
 /* ==========================================================
-   HERO MARK
+   HOMEPAGE — WELCOME / HERO MARK
    ========================================================== */
 
-.hero-mark {
-  margin: 2.2rem 0 2.5rem;
-  padding: 1.3rem 1.5rem;
+/*
+   The welcome formula is intentionally reminiscent of a
+   marginal note / theorem / manuscript annotation.
 
+   It should be noticeable, but not become a second hero.
+*/
+.hero-mark {
+  margin: 2rem 0 2.2rem;
+
+  /*
+     Slightly tightened from the earlier version.
+  */
+  padding: 1.1rem 1.35rem;
+
+  /*
+     Primary visual anchor for this panel.
+  */
   border-left: 2px solid var(--brass);
 
-  background: rgba(156, 122, 60, 0.06);
+  /*
+     Very soft brass wash.
+  */
+  background: rgba(156, 122, 60, 0.045);
 
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 
   color: var(--ink-soft);
 
+  /*
+     Long mathematics should scroll rather than destroy layout.
+  */
   overflow-x: auto;
 }
 
 
 /* ==========================================================
-   POST LIST
+   HOMEPAGE — POST LIST
    ========================================================== */
 
 .post-list {
   list-style: none;
-  margin: 0;
+
+  /*
+     Shorthand:
+       top right bottom left
+
+     This creates the gap after the welcome panel without
+     needing another spacer element.
+  */
+  margin: 2.6rem 0 0;
+
   padding: 0;
 }
 
 
+/*
+   Each post is a horizontal editorial row:
+
+     01   Post title                         Aug 2026
+*/
 .post-item {
   display: flex;
   align-items: baseline;
@@ -353,9 +669,20 @@ body {
 }
 
 
+/* ==========================================================
+   POST NUMBER
+   ========================================================== */
+
 .post-num {
+  /*
+     Do not allow number column to collapse.
+  */
   flex-shrink: 0;
 
+  /*
+     Gives every title the same starting position,
+     including post 01, 02, 10, etc.
+  */
   width: 3.2rem;
 
   font-family: 'IBM Plex Mono', monospace;
@@ -365,9 +692,14 @@ body {
 }
 
 
+/* ==========================================================
+   POST TITLE LINK
+   ========================================================== */
+
 .post-item a {
   color: var(--ink);
   text-decoration: none;
+
   font-weight: 500;
 }
 
@@ -377,7 +709,15 @@ body {
 }
 
 
+/* ==========================================================
+   POST DATE
+   ========================================================== */
+
 .post-date {
+
+  /*
+     Push date to far right of the row.
+  */
   margin-left: auto;
 
   font-family: 'IBM Plex Mono', monospace;
@@ -385,12 +725,15 @@ body {
 
   color: var(--ink-soft);
 
+  /*
+     Prevent dates like "Aug 2026" splitting.
+  */
   white-space: nowrap;
 }
 
 
 /* ==========================================================
-   SINGLE POST
+   SINGLE POST — HEADER
    ========================================================== */
 
 .post-header {
@@ -398,6 +741,9 @@ body {
 }
 
 
+/*
+   Small metadata line above an article title.
+*/
 .post-eyebrow {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
@@ -409,18 +755,36 @@ body {
 }
 
 
+/* ==========================================================
+   SINGLE POST — TITLE
+   ========================================================== */
+
 .post-title {
   margin: 0.3em 0 0.2em;
 
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 600;
 
+  /*
+     Fluid:
+       never below 1.8rem
+       grows with viewport
+       never above 2.5rem
+  */
   font-size: clamp(1.8rem, 6vw, 2.5rem);
+
   line-height: 1.2;
 }
 
 
+/* ==========================================================
+   SINGLE POST — SECTION HEADINGS
+   ========================================================== */
+
 .post-content h2 {
+  /*
+     Large top spacing creates clear article sections.
+  */
   margin-top: 2.2em;
 
   font-family: 'Fraunces', Georgia, serif;
@@ -430,10 +794,18 @@ body {
 }
 
 
+/* ==========================================================
+   SINGLE POST — PARAGRAPHS
+   ========================================================== */
+
 .post-content p {
   margin: 1.1em 0;
 }
 
+
+/* ==========================================================
+   CODE / TECHNICAL CONTENT
+   ========================================================== */
 
 .post-content code,
 .post-content pre {
@@ -442,6 +814,9 @@ body {
 }
 
 
+/*
+   Multi-line code blocks.
+*/
 .post-content pre {
   padding: 1rem 1.2rem;
 
@@ -450,16 +825,27 @@ body {
 
   overflow-x: auto;
 
+  /*
+     Almost-square corners fit the editorial language better
+     than large modern rounded cards.
+  */
   border-radius: 2px;
 }
 
 
+/*
+   Prevent nested code element inside <pre> from receiving
+   inline-code decoration.
+*/
 .post-content pre code {
   background: none;
   padding: 0;
 }
 
 
+/*
+   Inline code only.
+*/
 .post-content :not(pre) > code {
   padding: 0.1em 0.35em;
 
@@ -469,8 +855,13 @@ body {
 }
 
 
+/* ==========================================================
+   BLOCKQUOTES
+   ========================================================== */
+
 .post-content blockquote {
   margin: 1.4em 0;
+
   padding-left: 1.1em;
 
   border-left: 2px solid var(--navy);
@@ -481,6 +872,14 @@ body {
 }
 
 
+/* ==========================================================
+   MATHJAX / DISPLAY MATHEMATICS
+   ========================================================== */
+
+/*
+   Give display equations comfortable vertical space and allow
+   very wide equations to scroll on small screens.
+*/
 mjx-container[display="true"] {
   margin: 1.6em 0 !important;
   overflow-x: auto;
@@ -491,6 +890,12 @@ mjx-container[display="true"] {
    ABOUT PAGE
    ========================================================== */
 
+/*
+   Placeholder avatar.
+
+   If you later replace this with a photograph, you can either
+   remove this class or apply equivalent dimensions to <img>.
+*/
 .about-photo-placeholder {
   width: 84px;
   height: 84px;
@@ -517,7 +922,11 @@ mjx-container[display="true"] {
    ========================================================== */
 
 .site-footer {
+  /*
+     Generous separation from article/index content.
+  */
   margin-top: 4rem;
+
   padding-top: 1.5rem;
 
   border-top: 1px solid var(--paper-line);
@@ -526,13 +935,22 @@ mjx-container[display="true"] {
   font-size: 0.72rem;
 
   color: var(--ink-soft);
+
+  /*
+     Footer should visually recede from the actual content.
+  */
+  opacity: 0.72;
 }
 
 
 /* ==========================================================
-   ACCESSIBILITY
+   ACCESSIBILITY — KEYBOARD FOCUS
    ========================================================== */
 
+/*
+   :focus-visible gives keyboard users a clear outline without
+   showing one for ordinary mouse clicks in most browsers.
+*/
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--navy);
@@ -541,10 +959,16 @@ button:focus-visible {
 
 
 /* ==========================================================
-   RESPONSIVE HEADER
+   RESPONSIVE — INTERMEDIATE WIDTH
+   ==========================================================
 
-   Intermediate breakpoint prevents the fixed chart from
-   colliding with the title before we reach mobile.
+   Desktop:
+     full title + 450px constellation
+
+   At narrower widths:
+     constellation shrinks before disappearing completely.
+
+   This avoids title/chart collisions.
    ========================================================== */
 
 @media (max-width: 850px) {
@@ -556,41 +980,75 @@ button:focus-visible {
     gap: 1rem;
   }
 
+
+  /*
+     Reduce chart before reaching mobile.
+  */
   .chart-svg {
     flex-basis: 260px;
+
     width: 260px;
     max-width: 260px;
+
+    /*
+       Let the browser/SVG determine proportional height.
+       This prevents the intermediate chart being stretched.
+    */
+    height: auto;
   }
+
 
   .site-title {
     font-size: 2.35rem;
   }
-
 }
 
 
 /* ==========================================================
-   MOBILE
+   RESPONSIVE — MOBILE
    ========================================================== */
 
 @media (max-width: 650px) {
 
+  /*
+     Slightly smaller prose size on narrow screens.
+  */
   body {
     font-size: 17px;
   }
 
+
+  /*
+     Reduce page margins while retaining comfortable gutters.
+  */
   .wrap {
     padding: 2.2rem 1.2rem 4rem;
   }
 
+
+  /*
+     Dates are secondary information and make post rows cramped
+     on narrow screens.
+  */
   .post-date {
     display: none;
   }
 
+
+  /*
+     Constellation disappears completely on phones.
+
+     The identity remains through typography + jali background,
+     while the masthead remains easy to navigate.
+  */
   .chart-svg {
     display: none;
   }
 
+
+  /*
+     Once the chart is gone there is no reason for flex layout.
+  */
   .site-header-inner {
     display: block;
 
@@ -598,8 +1056,26 @@ button:focus-visible {
     padding-right: 1.2rem;
   }
 
+
   .site-title {
     font-size: 2.35rem;
+
+    /*
+       Allows unusually narrow phones to wrap rather than
+       overflowing horizontally.
+    */
+    white-space: normal;
   }
 
+
+  /*
+     The jali can be slightly larger on mobile so it doesn't
+     become visually dense behind the masthead.
+
+     Remove this rule if you prefer exactly the same pattern
+     scale everywhere.
+  */
+  .site-header::before {
+    background-size: 420px auto;
+  }
 }
