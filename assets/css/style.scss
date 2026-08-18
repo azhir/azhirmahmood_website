@@ -112,20 +112,17 @@ body {
      is necessary.
   */
   flex: 0 0 450px;
-
   width: 450px;
   max-width: 450px;
   height: 180px;
-
   margin-left: auto;
-
   display: block;
-
   pointer-events: none;
   overflow: visible;
-  transform: translateX(-150px);
+  // transform: translateX(-150px);
   color: var(--brass);
 }
+
 
 
 /*
