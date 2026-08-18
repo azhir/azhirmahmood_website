@@ -1,92 +1,574 @@
 <header class="site-header">
 
   <!-- =====================================================
-     CONSTELLATION GRAPHIC
-     Traces "Eridanus" (the River constellation) as a winding
-     chain of stars. The star marked with an orange blossom is
-     "Azha" (Eta Eridani) — a real star whose Arabic name is
-     phonetically close to "Azhir", and the blossom motif nods
-     to "Azhar" meaning "to bloom/shine" in Arabic.
+     Islamic geometric lattice (girih) — CSS background
      ===================================================== -->
-  <svg class="chart-svg" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 
-    <!-- The winding river-like path connecting the star chain -->
-    <path class="chart-line" d="M8,10 Q26,22 20,40 T34,64 T24,92 T44,110" fill="none"/>
-    <!-- Two extra branch lines connecting into the Azha node -->
-    <line class="chart-line" x1="20" y1="40" x2="52" y2="36"/>
-    <line class="chart-line" x1="34" y1="64" x2="62" y2="70"/>
+  <div class="site-header-inner">
 
-    <!-- The regular (non-Azha) stars along the chain -->
-    <circle class="chart-dot" cx="8" cy="10" r="1.6"/>
-    <circle class="chart-dot" cx="20" cy="40" r="1.8"/>
-    <circle class="chart-dot" cx="24" cy="92" r="1.6"/>
-    <circle class="chart-dot" cx="44" cy="110" r="1.4"/>
-    <circle class="chart-dot" cx="62" cy="70" r="1.4"/>
+    <div class="site-header-content">
+      <p class="coord-tick">
+        Azha &middot; &eta; Eridani &middot; al-Nahr (النهر)
+        &middot; RA 02h 56m DEC &minus;08&deg; 53&prime;
+      </p>
+
+      <p class="site-title">
+        <a href="{{ '/' | relative_url }}">Azhir Mahmood</a>
+      </p>
+
+      <p class="site-tagline">{{ site.tagline }}</p>
+
+      <nav class="site-nav">
+        <a href="{{ '/' | relative_url }}">Writing</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+        <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+      </nav>
+    </div>
+
 
     <!-- =====================================================
-       AZHA, rendered as an orange blossom instead of a plain dot.
-       Positioned at (52,36) — the same spot the two branch lines
-       above connect into. Scaled down (0.85) to fit the chart.
+       Eridanus / al-Nahr
        ===================================================== -->
-    <g transform="translate(52,36) scale(0.85)">
 
-      <!-- Five petals: each is the same paddle-shaped path
-         (narrow at the base, widening out, tapering to a point),
-         rotated 72° apart to form five-fold symmetry -->
-      <g class="blossom-petal">
-        <path d="M0,-1.3 C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
-                 C-5.4,-11.5 -1.6,-13.4 0,-13.6
-                 C1.6,-13.4 5.4,-11.5 4.6,-8.4
-                 C3.4,-5.6 1.6,-3.4 0,-1.3 Z" transform="rotate(0)"/>
-        <path d="M0,-1.3 C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
-                 C-5.4,-11.5 -1.6,-13.4 0,-13.6
-                 C1.6,-13.4 5.4,-11.5 4.6,-8.4
-                 C3.4,-5.6 1.6,-3.4 0,-1.3 Z" transform="rotate(72)"/>
-        <path d="M0,-1.3 C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
-                 C-5.4,-11.5 -1.6,-13.4 0,-13.6
-                 C1.6,-13.4 5.4,-11.5 4.6,-8.4
-                 C3.4,-5.6 1.6,-3.4 0,-1.3 Z" transform="rotate(144)"/>
-        <path d="M0,-1.3 C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
-                 C-5.4,-11.5 -1.6,-13.4 0,-13.6
-                 C1.6,-13.4 5.4,-11.5 4.6,-8.4
-                 C3.4,-5.6 1.6,-3.4 0,-1.3 Z" transform="rotate(216)"/>
-        <path d="M0,-1.3 C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
-                 C-5.4,-11.5 -1.6,-13.4 0,-13.6
-                 C1.6,-13.4 5.4,-11.5 4.6,-8.4
-                 C3.4,-5.6 1.6,-3.4 0,-1.3 Z" transform="rotate(288)"/>
+    <svg
+      class="chart-svg"
+      viewBox="0 0 220 160"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+
+      <defs>
+        <filter
+          id="starGlow"
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
+          <feGaussianBlur
+            stdDeviation="1.8"
+            result="blur"
+          />
+
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+
+      <!-- ===================================================
+           FIELD STARS
+           =================================================== -->
+
+      <g class="chart-field">
+        <circle cx="18"  cy="18"  r="0.7"/>
+        <circle cx="48"  cy="12"  r="0.6"/>
+        <circle cx="82"  cy="24"  r="0.55"/>
+        <circle cx="143" cy="17"  r="0.6"/>
+        <circle cx="193" cy="42"  r="0.65"/>
+
+        <circle cx="202" cy="82"  r="0.55"/>
+        <circle cx="189" cy="111" r="0.65"/>
+
+        <circle cx="19"  cy="106" r="0.55"/>
+        <circle cx="74"  cy="101" r="0.55"/>
+        <circle cx="157" cy="112" r="0.6"/>
+
+        <circle cx="84"  cy="149" r="0.55"/>
+        <circle cx="197" cy="146" r="0.65"/>
       </g>
 
-      <!-- Yellow stamen filaments radiating from the flower's center,
-         each with a small dot "anther" at the tip -->
-      <g stroke="#E8B84B" stroke-width="0.5" stroke-linecap="round" opacity="0.9">
-        <line x1="0" y1="0" x2="1.8" y2="-1.5"/>
-        <line x1="0" y1="0" x2="2.3" y2="0.2"/>
-        <line x1="0" y1="0" x2="1.6" y2="1.9"/>
-        <line x1="0" y1="0" x2="-0.4" y2="2.4"/>
-        <line x1="0" y1="0" x2="-1.8" y2="1.6"/>
-        <line x1="0" y1="0" x2="-2.2" y2="-0.3"/>
-        <line x1="0" y1="0" x2="-1.3" y2="-1.9"/>
-        <line x1="0" y1="0" x2="0.5" y2="-2.3"/>
+
+      <!-- ===================================================
+           ERIDANUS RIVER
+
+           Cursa
+             |
+           Beid
+              \
+              Keid
+                \
+               Rana
+              /    \
+           Azha    Zaurak
+                     \
+                   Angetenar
+                       \
+                      Acamar
+                         \
+                       Achernar
+           =================================================== -->
+
+      <path
+        class="chart-line"
+        d="
+          M211,14
+          L191,23
+          L174,33
+          L183,48
+          L165,58
+          L145,69
+          L129,81
+          L118,94
+          L106,105
+          L93,115
+          L78,125
+          L62,134
+          L45,143
+        "
+        fill="none"
+      />
+
+
+      <!-- Azha branch -->
+
+      <path
+        class="chart-line"
+        d="M145,69 L116,59"
+        fill="none"
+      />
+
+
+      <!-- ===================================================
+           STARS
+           =================================================== -->
+
+
+      <!-- Cursa -->
+      <circle
+        class="chart-dot"
+        cx="211"
+        cy="14"
+        r="2.1"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- intermediate -->
+      <circle
+        class="chart-dot"
+        cx="191"
+        cy="23"
+        r="0.9"
+        opacity="0.55"
+      />
+
+
+      <!-- Beid -->
+      <circle
+        class="chart-dot"
+        cx="174"
+        cy="33"
+        r="1.35"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- Keid -->
+      <circle
+        class="chart-dot"
+        cx="183"
+        cy="48"
+        r="1.45"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- intermediate -->
+      <circle
+        class="chart-dot"
+        cx="165"
+        cy="58"
+        r="0.9"
+        opacity="0.5"
+      />
+
+
+      <!-- Rana -->
+      <circle
+        class="chart-dot"
+        cx="145"
+        cy="69"
+        r="1.75"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- intermediate -->
+      <circle
+        class="chart-dot"
+        cx="129"
+        cy="81"
+        r="0.85"
+        opacity="0.48"
+      />
+
+
+      <!-- Zaurak -->
+      <circle
+        class="chart-dot"
+        cx="118"
+        cy="94"
+        r="1.75"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- intermediate -->
+      <circle
+        class="chart-dot"
+        cx="106"
+        cy="105"
+        r="0.85"
+        opacity="0.46"
+      />
+
+
+      <!-- Angetenar -->
+      <circle
+        class="chart-dot"
+        cx="93"
+        cy="115"
+        r="1.3"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- intermediate -->
+      <circle
+        class="chart-dot"
+        cx="78"
+        cy="125"
+        r="0.85"
+        opacity="0.45"
+      />
+
+
+      <!-- Acamar -->
+      <circle
+        class="chart-dot"
+        cx="62"
+        cy="134"
+        r="1.7"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- Achernar -->
+      <circle
+        class="chart-dot"
+        cx="45"
+        cy="143"
+        r="2.25"
+        filter="url(#starGlow)"
+      />
+
+
+      <!-- ===================================================
+           AZHA — PRIMARY FOCAL STAR / ORANGE BLOSSOM
+           =================================================== -->
+
+      <g
+        transform="translate(116,59) scale(1.18)"
+        filter="url(#starGlow)"
+      >
+
+        <g class="blossom-petal">
+
+          <path
+            d="M0,-1.3
+               C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
+               C-5.4,-11.5 -1.6,-13.4 0,-13.6
+               C1.6,-13.4 5.4,-11.5 4.6,-8.4
+               C3.4,-5.6 1.6,-3.4 0,-1.3 Z"
+            transform="rotate(0)"
+          />
+
+          <path
+            d="M0,-1.3
+               C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
+               C-5.4,-11.5 -1.6,-13.4 0,-13.6
+               C1.6,-13.4 5.4,-11.5 4.6,-8.4
+               C3.4,-5.6 1.6,-3.4 0,-1.3 Z"
+            transform="rotate(72)"
+          />
+
+          <path
+            d="M0,-1.3
+               C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
+               C-5.4,-11.5 -1.6,-13.4 0,-13.6
+               C1.6,-13.4 5.4,-11.5 4.6,-8.4
+               C3.4,-5.6 1.6,-3.4 0,-1.3 Z"
+            transform="rotate(144)"
+          />
+
+          <path
+            d="M0,-1.3
+               C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
+               C-5.4,-11.5 -1.6,-13.4 0,-13.6
+               C1.6,-13.4 5.4,-11.5 4.6,-8.4
+               C3.4,-5.6 1.6,-3.4 0,-1.3 Z"
+            transform="rotate(216)"
+          />
+
+          <path
+            d="M0,-1.3
+               C-1.6,-3.4 -3.4,-5.6 -4.6,-8.4
+               C-5.4,-11.5 -1.6,-13.4 0,-13.6
+               C1.6,-13.4 5.4,-11.5 4.6,-8.4
+               C3.4,-5.6 1.6,-3.4 0,-1.3 Z"
+            transform="rotate(288)"
+          />
+
+        </g>
+
+
+        <g
+          stroke="#E8B84B"
+          stroke-width="0.55"
+          stroke-linecap="round"
+          opacity="0.95"
+        >
+          <line x1="0" y1="0" x2="1.8"  y2="-1.5"/>
+          <line x1="0" y1="0" x2="2.3"  y2="0.2"/>
+          <line x1="0" y1="0" x2="1.6"  y2="1.9"/>
+          <line x1="0" y1="0" x2="-0.4" y2="2.4"/>
+
+          <line x1="0" y1="0" x2="-1.8" y2="1.6"/>
+          <line x1="0" y1="0" x2="-2.2" y2="-0.3"/>
+          <line x1="0" y1="0" x2="-1.3" y2="-1.9"/>
+          <line x1="0" y1="0" x2="0.5"  y2="-2.3"/>
+        </g>
+
+        <circle
+          cx="0"
+          cy="0"
+          r="1.15"
+          fill="#D9A038"
+        />
+
       </g>
-      <!-- The flower's central core (darker gold) -->
-      <circle cx="0" cy="0" r="1" fill="#D9A038"/>
-    </g>
-  </svg>
 
-  <!-- Azha's real celestial coordinates (Eta Eridani) — factual detail
-     that reinforces the "field notes" theme -->
-  <p class="coord-tick">Azha &middot; &eta; Eridani &middot; RA 02h 56m DEC &minus;08&deg; 53&prime;</p>
 
-  <!-- Site title — links back to the homepage -->
-  <p class="site-title"><a href="{{ '/' | relative_url }}">Azhir Mahmood</a></p>
+      <!-- ===================================================
+           LABELS
+           =================================================== -->
 
-  <!-- Tagline pulled from _config.yml (site.tagline) -->
-  <p class="site-tagline">{{ site.tagline }}</p>
 
-  <!-- Main navigation -->
-  <nav class="site-nav">
-    <a href="{{ '/' | relative_url }}">Writing</a>
-    <a href="{{ '/about/' | relative_url }}">About</a>
-    <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
-  </nav>
+      <!-- Cursa -->
+
+      <text
+        x="203"
+        y="9"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="8.8"
+        fill="currentColor"
+        opacity="0.58"
+        text-anchor="end"
+      >Cursa</text>
+
+      <text
+        x="203"
+        y="17"
+        font-family="Georgia, serif"
+        font-size="7.6"
+        fill="currentColor"
+        opacity="0.36"
+        text-anchor="end"
+      >الكرسي</text>
+
+
+      <!-- Beid -->
+
+      <text
+        x="167"
+        y="28"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="7"
+        fill="currentColor"
+        opacity="0.42"
+        text-anchor="end"
+      >Beid</text>
+
+      <text
+        x="167"
+        y="35"
+        font-family="Georgia, serif"
+        font-size="6.2"
+        fill="currentColor"
+        opacity="0.28"
+        text-anchor="end"
+      >البيض</text>
+
+
+      <!-- Keid -->
+
+      <text
+        x="190"
+        y="45"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="7"
+        fill="currentColor"
+        opacity="0.42"
+      >Keid</text>
+
+      <text
+        x="190"
+        y="52"
+        font-family="Georgia, serif"
+        font-size="6.2"
+        fill="currentColor"
+        opacity="0.28"
+      >القيد</text>
+
+
+      <!-- ===================================================
+           AZHA — strongest label
+           =================================================== -->
+
+      <text
+        x="124"
+        y="56"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="11.5"
+        fill="currentColor"
+        opacity="0.98"
+      >Azha</text>
+
+      <text
+        x="124"
+        y="67"
+        font-family="Georgia, serif"
+        font-size="9"
+        fill="currentColor"
+        opacity="0.70"
+      >ازها</text>
+
+
+      <!-- Rana -->
+
+      <text
+        x="151"
+        y="70"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="8"
+        fill="currentColor"
+        opacity="0.47"
+      >Rana</text>
+
+
+      <!-- Zaurak -->
+
+      <text
+        x="124"
+        y="93"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="8"
+        fill="currentColor"
+        opacity="0.54"
+      >Zaurak</text>
+
+      <text
+        x="124"
+        y="101"
+        font-family="Georgia, serif"
+        font-size="7"
+        fill="currentColor"
+        opacity="0.34"
+      >زورق</text>
+
+
+      <!-- Angetenar -->
+
+      <text
+        x="99"
+        y="114"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="6.9"
+        fill="currentColor"
+        opacity="0.39"
+      >Angetenar</text>
+
+
+      <!-- Acamar -->
+
+      <text
+        x="68"
+        y="132"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="7.7"
+        fill="currentColor"
+        opacity="0.48"
+      >Acamar</text>
+
+      <text
+        x="68"
+        y="140"
+        font-family="Georgia, serif"
+        font-size="6.7"
+        fill="currentColor"
+        opacity="0.30"
+      >آخر النهر</text>
+
+
+      <!-- Achernar -->
+
+      <text
+        x="39"
+        y="137"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-size="8.5"
+        fill="currentColor"
+        opacity="0.54"
+        text-anchor="end"
+      >Achernar</text>
+
+      <text
+        x="51"
+        y="146"
+        font-family="Georgia, serif"
+        font-size="6.9"
+        fill="currentColor"
+        opacity="0.30"
+      >آخر النهر</text>
+
+
+      <!-- ===================================================
+           CONSTELLATION CAPTION
+           =================================================== -->
+
+      <text
+        x="82"
+        y="94"
+        font-family="Georgia, serif"
+        font-size="5.8"
+        letter-spacing="1.1"
+        fill="currentColor"
+        opacity="0.10"
+      >ERIDANUS</text>
+
+      <text
+        x="82"
+        y="102"
+        font-family="Georgia, serif"
+        font-size="6.4"
+        fill="currentColor"
+        opacity="0.13"
+      >النهر</text>
+
+    </svg>
+
+  </div>
+
 </header>
