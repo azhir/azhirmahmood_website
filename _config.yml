@@ -4,7 +4,7 @@ description: >-
   Azhir's personal site and technical blog — notes on math, code,
   and whatever else is worth writing down properly.
 url: "https://azhirmahmood.com"
-baseurl: "/azhirmahmood_website"
+baseurl: ""
 # baseurl: ""
 
 author:
