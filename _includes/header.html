@@ -20,8 +20,10 @@
 
       <nav class="site-nav">
         <a href="{{ '/' | relative_url }}">Writing</a>
+        <span class="nav-sep" aria-hidden="true">&bull;</span>
+        <a href="{{ '/research/' | relative_url }}">Research</a>
+        <span class="nav-sep" aria-hidden="true">&bull;</span>
         <a href="{{ '/about/' | relative_url }}">About</a>
-        <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
       </nav>
     </div>
 
@@ -85,7 +87,7 @@
          SHIFT_Y   : move whole constellation up / down
          ROTATE_DEG: small compositional correction
          ===================================================== */
-      const STRETCH_X = 1.65;
+      const STRETCH_X = 1.35;
       const STRETCH_Y = 0.90;
       const SHIFT_X   = -200;
       const SHIFT_Y   = 10;
