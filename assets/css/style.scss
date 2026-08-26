@@ -101,7 +101,7 @@
      Increase this if you want wider articles.
      For prose I would keep this around 680–740px.
   */
-  --max-w: 700px;
+  --max-w: 1100px;
 }
 
 
@@ -176,16 +176,16 @@ body {
    ========================================================== */
 
 .wrap {
+   width: 80%;
   max-width: var(--max-w);
   margin: 0 auto;
-
   /*
      top | horizontal | bottom
 
      Bottom is deliberately generous because the page benefits
      from some manuscript-like empty paper.
   */
-  padding: 3rem 1.5rem 6rem;
+   padding: 3rem 0 6rem;
 }
 
 
@@ -322,13 +322,15 @@ body {
 
   width: 100%;
 
-  /*
-     Very large upper limit so the header can breathe on
-     wide displays without unnecessarily constraining the
-     constellation.
+   /*
+      Very large upper limit so the header can breathe on
+      wide displays without unnecessarily constraining the
+      constellation.
 
-     The normal page body remains only 700px wide.
-  */
+      The normal page body has its own responsive width,
+      capped by --max-w.
+   */
+
   max-width: 2300px;
 
   margin: 0 auto;
@@ -1023,6 +1025,7 @@ button:focus-visible {
      Reduce page margins while retaining comfortable gutters.
   */
   .wrap {
+    width: 100%;
     padding: 2.2rem 1.2rem 4rem;
   }
 
