@@ -96,12 +96,20 @@
   --navy: #1F3350;
 
   /*
-     Primary reading-column width.
+     LAYOUT WIDTHS
 
-     Increase this if you want wider articles.
-     For prose I would keep this around 680–740px.
+     These independently control the maximum desktop width of each
+     major page region. The wrappers also use width: 80%, so they
+     remain responsive below these limits.
+
+     Change one value to resize only that region:
+       --header-w   → masthead / constellation
+       --content-w  → page and post content
+       --footer-w   → footer
   */
-  --max-w: 1100px;
+  --header-w: 1100px;
+  --content-w: 920px;
+  --footer-w: 1100px;
 }
 
 
@@ -172,20 +180,80 @@ body {
 
 
 /* ==========================================================
-   MAIN READING COLUMN
+   PAGE WIDTH / LAYOUT WRAPPERS
    ========================================================== */
 
-.wrap {
-   width: 80%;
-  max-width: var(--max-w);
+/*
+   The page is split into three independent horizontal wrappers:
+
+     .header-wrap   → masthead / constellation
+     .content-wrap  → page and post content
+     .footer-wrap   → footer
+
+   Each wrapper uses:
+     width: 80%       → responsive percentage of the viewport
+     max-width        → upper limit on wide screens
+     margin: 0 auto   → horizontal centering
+
+   This separation is intentional. It lets you change the width of
+   one region without shifting the other two.
+*/
+
+
+/* Header width only. */
+.header-wrap {
+  width: 80%;
+  max-width: var(--header-w);
   margin: 0 auto;
+}
+
+
+/* Main reading/content width only. */
+.content-wrap {
+  width: 80%;
+  max-width: var(--content-w);
+  margin: 0 auto;
+
   /*
      top | horizontal | bottom
 
-     Bottom is deliberately generous because the page benefits
-     from some manuscript-like empty paper.
+     The generous bottom space keeps the page from feeling crowded
+     before the footer.
   */
-   padding: 3rem 0 6rem;
+  padding: 2rem 0 6rem;
+}
+
+/* ==========================================================
+   STANDARD PAGE CONTENT
+   ========================================================== */
+
+.content-wrap > h1 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 2.2rem;
+  line-height: 1.15;
+}
+
+.content-wrap > p,
+.content-wrap > ul,
+.content-wrap > ol,
+.content-wrap > blockquote {
+  max-width: 740px;
+}
+
+
+
+
+
+
+/* Footer width only. */
+.footer-wrap {
+  width: 80%;
+  max-width: var(--footer-w);
+  margin: 0 auto;
 }
 
 
@@ -203,6 +271,7 @@ body {
 */
 .site-header {
   position: relative;
+  
 
   margin-bottom: 1rem;
 
@@ -338,7 +407,7 @@ body {
   /*
      Distance from browser/window edges.
   */
-  padding: 0 2rem;
+  padding: 0 1rem;
 
   /*
      Text and constellation share one horizontal row.
@@ -372,118 +441,246 @@ body {
 
   flex: 0 0 auto;
 }
+/* ==========================================================
+   ERIDANUS CHART — CONTAINER
+   ========================================================== */
+
+.chart-wrap {
+  position: relative;
+
+  flex: 0 1 clamp(260px, 32vw, 450px);
+
+  width: clamp(260px, 32vw, 450px);
+  max-width: 450px;
+
+  aspect-ratio: 260 / 160;
+
+  margin-left: auto;
+
+  overflow: visible;
+}
 
 
 /* ==========================================================
-   STAR CHART
+   ERIDANUS CHART — PARTICLE FIELD
    ========================================================== */
 
+.eridanus-particles {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+
 /*
-   NOTE:
-
-   There used to be TWO .chart-svg definitions in this file.
-
-   Keep only this one.
-
-   The SVG itself uses a viewBox, so the celestial geometry
-   remains internally scalable.
+   particles.js inserts this canvas automatically.
 */
+.eridanus-particles canvas {
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+/* ==========================================================
+   ERIDANUS CHART — SVG LABEL LAYER
+   ========================================================== */
+
 .chart-svg {
+  position: absolute;
 
-  /*
-     Reserve a fixed horizontal region in the flex row.
-  */
-  flex: 0 0 450px;
+  inset: 0;
 
-  width: 450px;
-  max-width: 450px;
+  z-index: 2;
 
-  /*
-     Visual chart height.
-
-     Because this is a decorative SVG with a viewBox,
-     this value is primarily compositional.
-  */
-  height: 180px;
-
-  /*
-     Push constellation as far right as available space allows.
-  */
-  margin-left: auto;
+  width: 100%;
+  height: 100%;
 
   display: block;
 
-  /*
-     Decorative chart should not consume mouse/touch events.
-  */
-  pointer-events: none;
-
-  /*
-     Allows labels/glows to extend slightly beyond SVG edges.
-  */
   overflow: visible;
 
-  /*
-     `currentColor` inside the SVG can inherit this brass tone.
-  */
+  pointer-events: none;
+
   color: var(--brass);
 }
 
 
 /* ==========================================================
-   CONSTELLATION LINE
+   ERIDANUS CHART — LABELS
    ========================================================== */
 
-.chart-line {
-  fill: none;
+/*
+   Labels sit above the particle canvas.
 
-  stroke: var(--brass);
-  stroke-width: 1.15;
+   The paper-coloured stroke creates a small cartographic halo
+   around the lettering so graph lines cannot visually cut
+   through the text.
+*/
+.chart-label {
+  fill: currentColor;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-style: italic;
+
+  paint-order: stroke fill;
+
+  stroke: var(--paper);
+  stroke-width: 2.5px;
 
   stroke-linecap: round;
   stroke-linejoin: round;
 
-  /*
-     River remains quieter than the highlighted Azha blossom.
-  */
-  opacity: 0.64;
+  pointer-events: none;
+}
+
+
+/*
+   Arabic labels remain upright.
+*/
+.chart-label-arabic {
+  font-style: normal;
+
+  stroke-width: 2.3px;
 }
 
 
 /* ==========================================================
-   CONSTELLATION STARS
+   ERIDANUS CHART — MOBILE
    ========================================================== */
 
-.chart-dot {
-  fill: var(--brass);
+@media (max-width: 650px) {
+
+  .chart-wrap {
+    display: none;
+  }
+
 }
 
 
-/*
-   Optional class if a particular star should become much
-   darker / stronger.
-*/
-.chart-dot.bright {
-  fill: var(--ink);
-}
+// /* ==========================================================
+//    STAR CHART
+//    ========================================================== */
+
+// /*
+//    NOTE:
+
+//    There used to be TWO .chart-svg definitions in this file.
+
+//    Keep only this one.
+
+//    The SVG itself uses a viewBox, so the celestial geometry
+//    remains internally scalable.
+// */
+// .chart-svg {
+
+//   /*
+//      Reserve a fixed horizontal region in the flex row.
+//   */
+//   flex: 0 0 450px;
+
+//   width: 450px;
+//   max-width: 450px;
+
+//   /*
+//      Visual chart height.
+
+//      Because this is a decorative SVG with a viewBox,
+//      this value is primarily compositional.
+//   */
+//   height: 180px;
+
+//   /*
+//      Push constellation as far right as available space allows.
+//   */
+//   margin-left: auto;
+
+//   display: block;
+
+//   /*
+//      Decorative chart should not consume mouse/touch events.
+//   */
+//   pointer-events: none;
+
+//   /*
+//      Allows labels/glows to extend slightly beyond SVG edges.
+//   */
+//   overflow: visible;
+
+//   /*
+//      `currentColor` inside the SVG can inherit this brass tone.
+//   */
+//   color: var(--brass);
+// }
 
 
-/*
-   Tiny decorative background field stars.
-*/
-.chart-field circle {
-  fill: var(--brass);
-  opacity: 0.26;
-}
+// /* ==========================================================
+//    CONSTELLATION LINE
+//    ========================================================== */
+
+// .chart-line {
+//   fill: none;
+
+//   stroke: var(--brass);
+//   stroke-width: 1.15;
+
+//   stroke-linecap: round;
+//   stroke-linejoin: round;
+
+//   /*
+//      River remains quieter than the highlighted Azha blossom.
+//   */
+//   opacity: 0.5;
+// }
 
 
-/*
-   Azha blossom petals use the page colour so that the flower
-   appears partially cut from / integrated with the paper.
-*/
-.blossom-petal path {
-  fill: var(--paper);
-}
+// /* ==========================================================
+//    CONSTELLATION STARS
+//    ========================================================== */
+
+// .chart-dot {
+//   fill: var(--brass);
+// }
+
+
+// /*
+//    Optional class if a particular star should become much
+//    darker / stronger.
+// */
+// .chart-dot.bright {
+//   fill: var(--ink);
+// }
+
+
+// /*
+//    Tiny decorative background field stars.
+// */
+// .chart-field circle {
+//   fill: var(--brass);
+//   opacity: 0.18;
+// }
+
+
+// /*
+//    Azha blossom petals use the page colour so that the flower
+//    appears partially cut from / integrated with the paper.
+// */
+// .blossom-petal path {
+//   fill: var(--paper);
+// }
 
 
 /* ==========================================================
@@ -511,7 +708,7 @@ body {
    ========================================================== */
 
 .site-title {
-  margin: 0 0 .1em;
+  margin: 0 0 0.1em;
 
   font-family: 'Fraunces', Georgia, serif;
   font-style: italic;
@@ -546,7 +743,7 @@ body {
    ========================================================== */
 
 .site-tagline {
-  margin: 0 0 1.5rem;
+  margin: 0 0 0.8rem;
 
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.78rem;
@@ -565,7 +762,7 @@ body {
 .site-nav {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.8rem;
-  margin-top: 0.8rem;
+  margin-top: 0.3rem;
 }
 
 .site-nav a {
@@ -583,7 +780,6 @@ body {
   margin: 0 0.45rem;
   opacity: 0.35;
 }
-
 
 
 /* ==========================================================
@@ -765,9 +961,24 @@ body {
        grows with viewport
        never above 2.5rem
   */
-  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
 
-  line-height: 1.2;
+  line-height: 1.15;
+}
+
+
+/* ==========================================================
+   SINGLE POST — CONTENT CONTAINER
+   ========================================================== */
+
+/*
+   Main wrapper for rendered post content.
+
+   width: 100% makes the intent explicit:
+   the post body may use the full width provided by .content-wrap.
+*/
+.post-content {
+  width: 100%;
 }
 
 
@@ -777,14 +988,33 @@ body {
 
 .post-content h2 {
   /*
-     Large top spacing creates clear article sections.
+     Large top spacing creates clear separation between sections.
   */
   margin-top: 2.2em;
 
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 600;
-
   font-size: 1.4rem;
+}
+
+
+/* ==========================================================
+   SINGLE POST — READING WIDTH
+   ========================================================== */
+
+/*
+   Normal prose is intentionally narrower than the full post area
+   for a more comfortable reading line length.
+
+   Technical elements such as code blocks, equations, images,
+   figures, and tables are not included here, so they can use the
+   full available width when needed.
+*/
+.post-content p,
+.post-content ul,
+.post-content ol,
+.post-content blockquote {
+  max-width: 740px;
 }
 
 
@@ -793,6 +1023,9 @@ body {
    ========================================================== */
 
 .post-content p {
+  /*
+     Vertical rhythm between paragraphs.
+  */
   margin: 1.1em 0;
 }
 
@@ -801,6 +1034,12 @@ body {
    CODE / TECHNICAL CONTENT
    ========================================================== */
 
+/*
+   Use the monospace typeface for both inline and block code.
+
+   Code is slightly smaller than normal prose so technical material
+   remains compact without reducing the available horizontal width.
+*/
 .post-content code,
 .post-content pre {
   font-family: 'IBM Plex Mono', monospace;
@@ -810,6 +1049,9 @@ body {
 
 /*
    Multi-line code blocks.
+
+   Code blocks are allowed to use the full post width to reduce
+   unnecessary wrapping. Very long lines scroll horizontally.
 */
 .post-content pre {
   padding: 1rem 1.2rem;
@@ -820,16 +1062,18 @@ body {
   overflow-x: auto;
 
   /*
-     Almost-square corners fit the editorial language better
-     than large modern rounded cards.
+     Almost-square corners suit the restrained editorial style
+     better than large rounded cards.
   */
   border-radius: 2px;
 }
 
 
 /*
-   Prevent nested code element inside <pre> from receiving
-   inline-code decoration.
+   <pre> usually contains a nested <code> element.
+
+   Reset the inline-code treatment there so the code block receives
+   only the styling defined by .post-content pre.
 */
 .post-content pre code {
   background: none;
@@ -839,6 +1083,9 @@ body {
 
 /*
    Inline code only.
+
+   :not(pre) prevents this decoration from being applied to code
+   inside multi-line code blocks.
 */
 .post-content :not(pre) > code {
   padding: 0.1em 0.35em;
@@ -864,7 +1111,6 @@ body {
 
   font-style: italic;
 }
-
 
 /* ==========================================================
    MATHJAX / DISPLAY MATHEMATICS
@@ -1014,19 +1260,33 @@ button:focus-visible {
 @media (max-width: 650px) {
 
   /*
-     Slightly smaller prose size on narrow screens.
+     On phones all three outer wrappers use the full viewport width.
+
+     Main/footer gutters are supplied with padding. The header's
+     internal mobile gutter is controlled by .site-header-inner.
   */
-  body {
-    font-size: 17px;
+  .header-wrap,
+  .content-wrap,
+  .footer-wrap {
+    width: 100%;
+    max-width: none;
+  }
+
+  .content-wrap {
+    padding: 2.2rem 1.2rem 4rem;
+  }
+
+  .footer-wrap {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
   }
 
 
   /*
-     Reduce page margins while retaining comfortable gutters.
+     Slightly smaller prose size on narrow screens.
   */
-  .wrap {
-    width: 100%;
-    padding: 2.2rem 1.2rem 4rem;
+  body {
+    font-size: 17px;
   }
 
 

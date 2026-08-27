@@ -1,15 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   {% include head.html %}
 </head>
+
 <body>
-  <div class="wrap">
+
+  <div class="header-wrap">
     {% include header.html %}
-    <main>
-      {{ content }}
-    </main>
+  </div>
+
+  <main class="content-wrap">
+    {{ content }}
+  </main>
+
+  <div class="footer-wrap">
     {% include footer.html %}
   </div>
+
+
+  <!-- =====================================================
+       CONSTELLATION SCRIPTS
+       ===================================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"
+    defer
+  ></script>
+
+  <script
+    src="{{ '/assets/js/eridanus-chart.js' | relative_url }}"
+    defer
+  ></script>
+
 </body>
+
 </html>
