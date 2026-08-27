@@ -1033,30 +1033,117 @@
       allStars
     );
 
+
+
+
+
+
+/* ==========================================================
+   CROSS-PAGE CONTINUITY
+
+   The constellation has one simulation clock for the whole
+   browser session.
+
+   Therefore:
+     Writing -> Research -> About
+   does not restart the system.
+
+   A completely new tab/session still begins fresh.
+   ========================================================== */
+
+const SESSION_KEY =
+  'eridanus-simulation-clock-v2';
+
+
+function loadSimulationTime() {
+  try {
+    const raw =
+      sessionStorage.getItem(
+        SESSION_KEY
+      );
+
+    if (!raw) {
+      return 0;
+    }
+
+    const saved =
+      JSON.parse(raw);
+
+    if (
+      !saved ||
+      !Number.isFinite(
+        saved.elapsedMs
+      )
+    ) {
+      return 0;
+    }
+
+    /*
+       Also account for the small amount of real time spent
+       navigating from one page to another.
+
+       This makes navigation feel almost seamless rather than
+       pausing the constellation during page loading.
+    */
+    if (
+      Number.isFinite(
+        saved.savedAt
+      )
+    ) {
+      return (
+        saved.elapsedMs +
+        Math.max(
+          0,
+          Date.now() -
+          saved.savedAt
+        )
+      );
+    }
+
+    return saved.elapsedMs;
+
+  } catch (error) {
+    /*
+       sessionStorage is only progressive enhancement.
+
+       If unavailable, simply start from the beginning.
+    */
+    return 0;
+  }
+}
+
+
+
+
   /* ==========================================================
      RUNTIME STATE
      ========================================================== */
 
-  const runtime = {
-    positions: {},
-    visibility: {},
+const runtime = {
+  positions: {},
+  visibility: {},
 
-    /*
-       Map allows graph edges to persist independently from
-       each frame's set of active pairs.
-    */
-    edges:
-      new Map(),
+  /*
+     Map allows graph edges to persist independently from
+     each frame's set of active pairs.
+  */
+  edges:
+    new Map(),
 
-    labels: {},
+  labels: {},
 
-    raf: 0,
+  raf: 0,
 
-    running: false,
+  running: false,
 
-    elapsedMs: 0,
-    lastStartedAt: 0
-  };
+  /*
+     Continue from the previous page in this browser session.
+  */
+  elapsedMs:
+    loadSimulationTime(),
+
+  lastStartedAt: 0
+};
 
   /* ==========================================================
      CREATE BRIDGE STAR ELEMENTS
@@ -2091,12 +2178,80 @@
     );
   }
 
-  /*
-     Always create a valid static first frame.
-  */
-  renderAt(0);
 
-  start();
+/* ==========================================================
+   SAVE SESSION CLOCK
+   ========================================================== */
+
+function saveSimulationTime() {
+  try {
+    /*
+       runtime.elapsedMs only contains completed running
+       intervals.
+
+       If animation is currently running we also include the
+       interval since start() was last called.
+    */
+    const elapsed =
+      runtime.elapsedMs +
+      (
+        runtime.running
+          ?
+            performance.now() -
+            runtime.lastStartedAt
+          :
+            0
+      );
+
+    sessionStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        elapsedMs:
+          elapsed,
+
+        /*
+           Record wall-clock time so the next page can include
+           the brief navigation interval.
+        */
+        savedAt:
+          Date.now()
+      })
+    );
+
+  } catch (error) {
+    /*
+       Persistence is optional.
+
+       The constellation still functions normally if storage
+       has been disabled by the browser.
+    */
+  }
+}
+
+
+
+
+  // /*
+  //    Always create a valid static first frame.
+  // */
+  // renderAt(0);
+
+  // start();
+
+/*
+   Render the correct current session state immediately.
+
+   Using runtime.elapsedMs rather than 0 prevents a visible
+   flash of the constellation's starting configuration when
+   moving between pages.
+*/
+renderAt(
+  runtime.elapsedMs
+);
+
+start();
+
+
 
   /*
      Don't animate hidden tabs.
@@ -2104,15 +2259,29 @@
      This saves CPU and resumes at the same simulation time
      when the user returns.
   */
-  document.addEventListener(
-    'visibilitychange',
-    () => {
-      if (document.hidden) {
-        stop();
-      } else {
-        start();
-      }
+document.addEventListener(
+  'visibilitychange',
+  () => {
+    if (document.hidden) {
+      stop();
+    } else {
+      start();
     }
-  );
+  }
+);
+
+
+/* ==========================================================
+   CROSS-PAGE SAVE
+
+   pagehide is used rather than unload because it behaves
+   better with modern navigation and the back-forward cache.
+   ========================================================== */
+
+window.addEventListener(
+  'pagehide',
+  saveSimulationTime
+);
+
 
 })();
