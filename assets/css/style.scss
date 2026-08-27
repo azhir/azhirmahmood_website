@@ -1081,9 +1081,10 @@ body {
      This creates the gap after the welcome panel without
      needing another spacer element.
   */
-  margin: 2.6rem 0 0;
-
+  margin: 2.6rem auto 0;
   padding: 0;
+  width: 90%;
+
 }
 
 
@@ -1094,13 +1095,63 @@ body {
 */
 .post-item {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
 
   gap: 1rem;
 
   padding: 1.05rem 0;
 
   border-bottom: 1px solid var(--paper-line);
+}
+
+
+.post-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-abstract {
+  margin: 0.25rem 0 0;
+  max-width: 620px;
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+
+  color: var(--ink-soft);
+}
+
+
+/* ==========================================================
+   HOMEPAGE — POST SUMMARY
+   ========================================================== */
+
+.post-summary {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-excerpt {
+  max-width: 620px;
+  margin: 0.3rem 0 0;
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+
+  color: var(--ink-soft);
+}
+
+.post-thumb {
+  flex: 0 0 150px;
+  width: 150px;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+}
+
+.post-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 

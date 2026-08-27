@@ -2,17 +2,46 @@
 layout: default
 title: Home
 ---
+
 <div class="hero-mark">
   $$ \S \quad \text{welcome} := \left\{\, x \in \text{azhir.com} \;\middle|\; x \text{ is worth writing down properly} \,\right\} $$
 </div>
 
 <ul class="post-list">
   {% assign posts = site.posts %}
+
   {% for post in posts %}
   <li class="post-item">
-    <span class="post-num">{{ posts.size | minus: forloop.index0 | plus: 0 | prepend: "0" | slice: -2, 2 }}</span>
-    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-    <span class="post-date">{{ post.date | date: "%b %Y" }}</span>
+    <span class="post-num">
+      {{ posts.size | minus: forloop.index0 | plus: 0 | prepend: "0" | slice: -2, 2 }}
+    </span>
+
+    {% if post.image %}
+    <a class="post-thumb" href="{{ post.url | relative_url }}">
+      <img
+        src="{{ post.image | relative_url }}"
+        alt="{{ post.image_alt | default: post.title }}"
+      >
+    </a>
+    {% endif %}
+
+    <div class="post-summary">
+      <a href="{{ post.url | relative_url }}">
+        {{ post.title }}
+      </a>
+
+      <p class="post-excerpt">
+        {% if post.abstract %}
+          {{ post.abstract }}
+        {% else %}
+          {{ post.excerpt | strip_html | strip_newlines | truncatewords: 28 }}
+        {% endif %}
+      </p>
+    </div>
+
+    <span class="post-date">
+      {{ post.date | date: "%b %Y" }}
+    </span>
   </li>
   {% endfor %}
 </ul>
