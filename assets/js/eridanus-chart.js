@@ -1,815 +1,439 @@
 (function () {
+  'use strict';
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const WIDTH = 260;
+  const HEIGHT = 110;
+
+  const svg = document.getElementById('eridanus-chart');
+  if (!svg) return;
 
   /* ==========================================================
-     ERIDANUS — LIVING CONSTELLATION
-     ==========================================================
+     CONFIG
 
-     DESIGN
-
-     particles.js:
-       - renders all stars
-       - moves anonymous/background stars
-       - draws proximity-based graph connections
-
-     Named stars:
-       - are still real particles.js particles
-       - follow independent mathematical paths
-       - do NOT exert forces on each other
-       - do NOT use springs, steering or gravity
-       - never bounce from chart boundaries
-
-     Each named star has:
-       - a normalized home position
-       - its own orbit/path type
-       - its own width and height
-       - its own rotation
-       - its own speed and direction
-       - subtle smooth path deformation
-
-     Requested paths are automatically reduced only when
-     necessary to guarantee they remain inside the chart.
+     These are the main values to experiment with.
      ========================================================== */
 
+  const CONFIG = {
+    bridgeStars: {
+      enabled: true,
 
-  /* ==========================================================
-     SETUP
-     ========================================================== */
+      // Try 8 / 12 / 16.
+      count: 12,
 
-  const svg =
-    document.getElementById(
-      'eridanus-chart'
-    );
+      minOpacity: 0.10,
+      maxOpacity: 0.34,
 
-  const particleField =
-    document.getElementById(
-      'eridanus-particles'
-    );
+      fadeMinSeconds: 24,
+      fadeMaxSeconds: 52,
 
-  const labelsG =
-    document.getElementById(
-      'eridanus-labels'
-    );
+      minRadius: 0.62,
+      maxRadius: 1.12,
 
+      // Maximum graph degree for anonymous stars.
+      maxConnections: 3
+    },
 
-  if (
-    !svg ||
-    !particleField ||
-    !labelsG
-  ) {
-    return;
-  }
+    graph: {
+      // New connections appear inside this distance.
+      connectAt: 35,
 
+      // Existing connections survive until this distance.
+      // Gives hysteresis, preventing flicker.
+      disconnectAt: 42,
 
-  const NS =
-    'http://www.w3.org/2000/svg';
+      // Named stars may support slightly richer topology.
+      maxNamedConnections: 4,
 
+      minEdgeOpacity: 0.045,
+      maxEdgeOpacity: 0.30,
+
+      // Smoothing rate for lines.
+      fadeSpeed: 0.075,
+
+      // Higher = labels require more local connectivity
+      // before becoming prominent.
+      labelInfluence: 1.55
+    },
+
+    labels: {
+      maxSecondaryOpacity: 0.64,
+      fadeSpeed: 0.055,
+
+      // Produces: Azha · ازها
+      separator: ' · ',
+
+      arabicScale: 0.82,
+
+      // Extra gap before Arabic text.
+      gap: 3.2
+    }
+  };
 
   const reduceMotion =
     window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-
-  /* ==========================================================
-     SAFE CHART BOUNDS
-
-     Named stars never cross these boundaries.
-
-     Because orbit dimensions are calculated in advance,
-     there is no clamp during animation and therefore no
-     flattened/janky edge motion.
-     ========================================================== */
-
-  const SAFE_LEFT =
-    0.025;
-
-  const SAFE_RIGHT =
-    0.975;
-
-  const SAFE_TOP =
-    0.055;
-
-  const SAFE_BOTTOM =
-    0.945;
-
-
-  /* ==========================================================
-     HELPERS
-     ========================================================== */
-
-  function makeEl(
-    tag,
-    attrs,
-    parent
-  ) {
-
-    const el =
-      document.createElementNS(
-        NS,
-        tag
-      );
-
-
-    Object.entries(
-      attrs
-    )
-      .forEach(
-        function (
-          [key, value]
-        ) {
-
-          el.setAttribute(
-            key,
-            value
-          );
-
-        }
-      );
-
-
-    parent.appendChild(
-      el
-    );
-
-
-    return el;
-
-  }
-
-
-  /* ==========================================================
-     PARTICLES.JS
-     ========================================================== */
-
-  if (
-    !reduceMotion &&
-    typeof particlesJS === 'function'
-  ) {
-
-    particlesJS(
-      'eridanus-particles',
-      {
-
-        particles: {
-
-          /* --------------------------------------------------
-             15 NODES
-
-             9 named stars
-             6 anonymous bridge nodes
-             -------------------------------------------------- */
-
-          number: {
-
-            value: 15,
-
-            density: {
-              enable: false
-            }
-
-          },
-
-
-          color: {
-            value: '#9b7a3c'
-          },
-
-
-          shape: {
-
-            type: 'circle',
-
-            stroke: {
-              width: 0,
-              color: '#9b7a3c'
-            }
-
-          },
-
-
-          opacity: {
-
-            value: 0.72,
-
-            random: true,
-
-            anim: {
-              enable: false,
-              speed: 1,
-              opacity_min: 0.2,
-              sync: false
-            }
-
-          },
-
-
-          size: {
-
-            value: 1.7,
-
-            random: true,
-
-            anim: {
-              enable: false,
-              speed: 1,
-              size_min: 0.5,
-              sync: false
-            }
-
-          },
-
-
-          /* --------------------------------------------------
-             GRAPH CONNECTIONS
-
-             Keep this selective.
-
-             Connections should appear and disappear as the
-             constellation changes rather than everything
-             remaining permanently connected.
-             -------------------------------------------------- */
-
-          line_linked: {
-
-            enable: true,
-
-            distance: 96,
-
-            color: '#9b7a3c',
-
-            opacity: 0.30,
-
-            width: 0.85
-
-          },
-
-
-          /* --------------------------------------------------
-             ANONYMOUS NODE MOTION
-
-             Only anonymous nodes actually use particles.js
-             velocity.
-
-             Named particles are repositioned directly below.
-             -------------------------------------------------- */
-
-          move: {
-
-            enable: true,
-
-            speed: 1.15,
-
-            direction: 'none',
-
-            random: true,
-
-            straight: false,
-
-            out_mode: 'bounce',
-
-            bounce: true,
-
-
-            attract: {
-              enable: false,
-              rotateX: 600,
-              rotateY: 1200
-            }
-
-          }
-
-        },
-
-
-        interactivity: {
-
-          detect_on: 'canvas',
-
-          events: {
-
-            onhover: {
-              enable: false,
-              mode: 'grab'
-            },
-
-            onclick: {
-              enable: false,
-              mode: 'push'
-            },
-
-            resize: true
-
-          }
-
-        },
-
-
-        retina_detect: true
-
-      }
-    );
-
-  }
-
+  /*
+     Normalized bounds.
+
+     Authored orbits are automatically reduced when necessary
+     so named and bridge stars cannot escape the chart.
+  */
+  const SAFE = {
+    left: 0.035,
+    right: 0.965,
+    top: 0.075,
+    bottom: 0.925
+  };
 
   /* ==========================================================
      NAMED STAR CONFIGURATION
 
-     ALL GEOMETRY IS NORMALIZED.
+     This deliberately preserves the character of the original
+     implementation:
 
-     x / y:
-       home position
-
-     radiusX / radiusY:
-       desired orbit dimensions
-
-       These can be intentionally large.
-
-       The system calculates a safe scale automatically if
-       the requested orbit would leave the chart.
-
-     rotation:
-       radians
-
-       0      = horizontal
-       0.785  = about 45 degrees
-       -0.785 = about -45 degrees
-
-     speed:
-       positive = one direction
-       negative = opposite direction
-
-     path:
        ellipse
        flow
        wave
        loop
 
-     deformation:
-       how strongly the orbit departs from a perfect ellipse
+     Each star retains:
+       - its own home position
+       - its own orbit
+       - amplitude
+       - rotation
+       - direction
+       - velocity
+       - deformation
+
+     Speeds are time-based rather than frame-based.
      ========================================================== */
 
   const namedStarConfig = {
-
     achernar: {
-
       x: 0.10,
       y: 0.23,
-
       r: 2.35,
 
       path: 'ellipse',
-
       radiusX: 0.16,
       radiusY: 0.070,
 
       rotation: 0.20,
+      speed: 0.114,
+      deformation: 0.12,
 
-      speed: 0.00190,
+      label: 'Achernar',
 
-      deformation: 0.12
+      dx: 7,
+      dy: -5,
+      anchor: 'start',
 
+      size: 8.2,
+      baseLabelOpacity: 0.16
     },
 
-
     acamar: {
-
       x: 0.20,
       y: 0.38,
-
       r: 1.80,
 
       path: 'flow',
-
       radiusX: 0.19,
       radiusY: 0.085,
 
       rotation: -0.12,
+      speed: -0.132,
+      deformation: 0.18,
 
-      speed: -0.00220,
+      label: 'Acamar',
+      arabic: 'آخر النهر',
 
-      deformation: 0.18
+      dx: -7,
+      dy: -5,
+      anchor: 'end',
 
+      size: 7.5,
+      baseLabelOpacity: 0.13
     },
 
-
-    /* --------------------------------------------------------
-       AZHA
-
-       Still calmer than the rest, but its orbit is now large
-       enough to visibly alter nearby connections.
-       -------------------------------------------------------- */
-
     azha: {
-
       x: 0.30,
       y: 0.69,
-
       r: 3.00,
 
       path: 'ellipse',
-
       radiusX: 0.125,
       radiusY: 0.052,
 
       rotation: -0.22,
+      speed: 0.087,
+      deformation: 0.10,
 
-      speed: 0.00145,
+      label: 'Azha',
+      arabic: 'ازها',
 
-      deformation: 0.10
+      dx: 9,
+      dy: -2,
+      anchor: 'start',
 
+      size: 10.5,
+      baseLabelOpacity: 0.96,
+
+      primary: true
     },
 
-
     rana: {
-
       x: 0.47,
       y: 0.43,
-
       r: 1.85,
 
       path: 'flow',
-
       radiusX: 0.22,
       radiusY: 0.095,
 
       rotation: 0.27,
+      speed: -0.150,
+      deformation: 0.21,
 
-      speed: -0.00250,
+      label: 'Rana',
 
-      deformation: 0.21
+      dx: 7,
+      dy: -4,
+      anchor: 'start',
 
+      size: 7.8,
+      baseLabelOpacity: 0.12
     },
 
-
     beid: {
-
       x: 0.59,
       y: 0.62,
-
       r: 1.45,
 
       path: 'ellipse',
-
       radiusX: 0.18,
       radiusY: 0.085,
 
       rotation: -0.35,
+      speed: 0.126,
+      deformation: 0.14,
 
-      speed: 0.00210,
+      label: 'Beid',
+      arabic: 'البيض',
 
-      deformation: 0.14
+      dx: -7,
+      dy: -5,
+      anchor: 'end',
 
+      size: 7.1,
+      baseLabelOpacity: 0.10
     },
 
-
     zaurak: {
-
       x: 0.71,
       y: 0.50,
-
       r: 1.85,
 
       path: 'wave',
-
       radiusX: 0.20,
       radiusY: 0.090,
 
       rotation: 0.18,
+      speed: -0.138,
+      deformation: 0.19,
 
-      speed: -0.00230,
+      label: 'Zaurak',
+      arabic: 'زورق',
 
-      deformation: 0.19
+      dx: 7,
+      dy: -4,
+      anchor: 'start',
 
+      size: 7.9,
+      baseLabelOpacity: 0.13
     },
 
-
     angetenar: {
-
       x: 0.66,
       y: 0.76,
-
       r: 1.45,
 
       path: 'loop',
-
       radiusX: 0.17,
       radiusY: 0.075,
 
       rotation: -0.28,
+      speed: 0.156,
+      deformation: 0.17,
 
-      speed: 0.00260,
+      label: 'Angetenar',
 
-      deformation: 0.17
+      dx: 7,
+      dy: 3,
+      anchor: 'start',
 
+      size: 6.7,
+      baseLabelOpacity: 0.08
     },
 
-
     keid: {
-
       x: 0.81,
       y: 0.69,
-
       r: 1.55,
 
       path: 'flow',
-
       radiusX: 0.17,
       radiusY: 0.080,
 
       rotation: 0.34,
+      speed: -0.141,
+      deformation: 0.16,
 
-      speed: -0.00235,
+      label: 'Keid',
+      arabic: 'القيد',
 
-      deformation: 0.16
+      dx: 7,
+      dy: -4,
+      anchor: 'start',
 
+      size: 7.1,
+      baseLabelOpacity: 0.10
     },
 
-
     cursa: {
-
       x: 0.88,
       y: 0.42,
-
       r: 2.10,
 
       path: 'ellipse',
-
       radiusX: 0.14,
       radiusY: 0.065,
 
       rotation: -0.26,
+      speed: 0.111,
+      deformation: 0.11,
 
-      speed: 0.00185,
-
-      deformation: 0.11
-
-    }
-
-  };
-
-
-  /* ==========================================================
-     LABEL CONFIGURATION
-
-     Labels remain in SVG coordinates because the SVG uses:
-
-       viewBox="0 0 260 110"
-     ========================================================== */
-
-  const labels = [
-
-    {
-
-      star: 'cursa',
-
-      text: 'Cursa',
+      label: 'Cursa',
       arabic: 'الكرسي',
 
-      dx: -9,
-      dy: -6,
-
-      adx: -9,
-      ady: 2,
-
-      anchor: 'end',
-
-      size: 8.6,
-      arabicSize: 7.1,
-
-      opacity: 0.58
-
-    },
-
-
-    {
-
-      star: 'beid',
-
-      text: 'Beid',
-      arabic: 'البيض',
-
-      dx: -8,
+      dx: -7,
       dy: -5,
-
-      adx: -8,
-      ady: 3,
-
       anchor: 'end',
 
-      size: 7.2,
-      arabicSize: 6.1,
-
-      opacity: 0.45
-
-    },
-
-
-    {
-
-      star: 'keid',
-
-      text: 'Keid',
-      arabic: 'القيد',
-
-      dx: 8,
-      dy: -3,
-
-      adx: 8,
-      ady: 5,
-
-      anchor: 'start',
-
-      size: 7.2,
-      arabicSize: 6.1,
-
-      opacity: 0.45
-
-    },
-
-
-    {
-
-      star: 'rana',
-
-      text: 'Rana',
-
-      dx: 8,
-      dy: -3,
-
-      anchor: 'start',
-
-      size: 7.8,
-
-      opacity: 0.50
-
-    },
-
-
-    {
-
-      star: 'azha',
-
-      text: 'Azha',
-      arabic: 'ازها',
-
-      dx: 10,
-      dy: -2,
-
-      adx: 10,
-      ady: 7,
-
-      anchor: 'start',
-
-      size: 10.7,
-      arabicSize: 8.3,
-
-      opacity: 0.96
-
-    },
-
-
-    {
-
-      star: 'zaurak',
-
-      text: 'Zaurak',
-      arabic: 'زورق',
-
-      dx: 9,
-      dy: -3,
-
-      adx: 9,
-      ady: 5,
-
-      anchor: 'start',
-
-      size: 7.9,
-      arabicSize: 6.6,
-
-      opacity: 0.54
-
-    },
-
-
-    {
-
-      star: 'angetenar',
-
-      text: 'Angetenar',
-
-      dx: 8,
-      dy: 2,
-
-      anchor: 'start',
-
-      size: 6.8,
-
-      opacity: 0.41
-
-    },
-
-
-    {
-
-      star: 'acamar',
-
-      text: 'Acamar',
-      arabic: 'آخر النهر',
-
-      dx: -8,
-      dy: -3,
-
-      adx: -8,
-      ady: 5,
-
-      anchor: 'end',
-
-      size: 7.6,
-      arabicSize: 6.3,
-
-      opacity: 0.49
-
-    },
-
-
-    {
-
-      star: 'achernar',
-
-      text: 'Achernar',
-
-      dx: -8,
-      dy: -5,
-
-      anchor: 'end',
-
-      size: 8.3,
-
-      opacity: 0.55
-
+      size: 8.4,
+      baseLabelOpacity: 0.15
     }
-
-  ];
-
+  };
 
   /* ==========================================================
-     PATH FUNCTIONS
-
-     These produce LOCAL coordinates.
-
-     Their approximate ranges remain around:
-
-       x: -1 → +1
-       y: -1 → +1
-
-     Small smooth deformations make the movement feel less
-     mechanical without introducing noise or impulses.
+     SVG HELPERS
      ========================================================== */
 
-  function getOrbitPoint(
-    particle,
-    angle
-  ) {
+  function createSvg(tag, attrs, parent) {
+    const element =
+      document.createElementNS(
+        SVG_NS,
+        tag
+      );
 
-    const deformation =
-      particle.eridanusDeformation;
+    Object.entries(
+      attrs || {}
+    ).forEach(
+      ([key, value]) => {
+        element.setAttribute(
+          key,
+          String(value)
+        );
+      }
+    );
 
+    parent.appendChild(element);
+
+    return element;
+  }
+
+  function clamp01(value) {
+    return Math.max(
+      0,
+      Math.min(1, value)
+    );
+  }
+
+  function lerp(current, target, amount) {
+    return (
+      current +
+      (target - current) *
+      amount
+    );
+  }
+
+  /* ==========================================================
+     DETERMINISTIC RANDOMNESS
+
+     Bridge stars should look irregular without completely
+     changing identity every reload.
+     ========================================================== */
+
+  function hash01(seed) {
+    let x = seed | 0;
+
+    x =
+      Math.imul(
+        x ^ (x >>> 16),
+        0x45d9f3b
+      );
+
+    x =
+      Math.imul(
+        x ^ (x >>> 16),
+        0x45d9f3b
+      );
+
+    x =
+      x ^
+      (x >>> 16);
+
+    return (
+      (x >>> 0) /
+      4294967295
+    );
+  }
+
+  function seeded(index, channel) {
+    return hash01(
+      (index + 1) *
+      73856093 ^
+      (channel + 1) *
+      19349663
+    );
+  }
+
+  /* ==========================================================
+     ORIGINAL PATH CHARACTER
+     ========================================================== */
+
+  function getOrbitPoint(star, angle) {
+    const d =
+      star.deformation;
 
     let x;
     let y;
 
-
-    switch (
-      particle.eridanusPath
-    ) {
-
-
-      /* ------------------------------------------------------
-         FLOW
-
-         Long celestial-looking path with gentle asymmetry.
-         ------------------------------------------------------ */
-
+    switch (star.path) {
       case 'flow':
-
         x =
-          Math.cos(
-            angle
-          )
-          +
-          deformation *
+          Math.cos(angle) +
+          d *
           Math.sin(
             angle * 2.0
           );
 
-
         y =
-          Math.sin(
-            angle
-          )
-          +
-          deformation *
+          Math.sin(angle) +
+          d *
           0.55 *
           Math.cos(
             angle * 1.5
@@ -817,34 +441,17 @@
 
         break;
 
-
-      /* ------------------------------------------------------
-         WAVE
-
-         More horizontally wandering.
-
-         Useful for changing graph topology.
-         ------------------------------------------------------ */
-
       case 'wave':
-
         x =
-          Math.cos(
-            angle
-          )
-          +
-          deformation *
+          Math.cos(angle) +
+          d *
           Math.cos(
             angle * 2.5
           );
 
-
         y =
-          Math.sin(
-            angle
-          )
-          +
-          deformation *
+          Math.sin(angle) +
+          d *
           0.50 *
           Math.sin(
             angle * 2.0
@@ -852,33 +459,18 @@
 
         break;
 
-
-      /* ------------------------------------------------------
-         LOOP
-
-         Slightly more complex but still continuous and calm.
-         ------------------------------------------------------ */
-
       case 'loop':
-
         x =
-          Math.cos(
-            angle
-          )
-          +
-          deformation *
+          Math.cos(angle) +
+          d *
           0.75 *
           Math.sin(
             angle * 2.0
           );
 
-
         y =
-          Math.sin(
-            angle
-          )
-          +
-          deformation *
+          Math.sin(angle) +
+          d *
           0.65 *
           Math.cos(
             angle * 3.0
@@ -886,105 +478,61 @@
 
         break;
 
-
-      /* ------------------------------------------------------
-         ELLIPSE
-
-         Not perfectly mathematical: gets a very small
-         harmonic deformation.
-         ------------------------------------------------------ */
-
       case 'ellipse':
-
       default:
-
         x =
-          Math.cos(
-            angle
-          )
-          +
-          deformation *
+          Math.cos(angle) +
+          d *
           0.35 *
           Math.sin(
             angle * 2.0
           );
 
-
         y =
-          Math.sin(
-            angle
-          )
-          +
-          deformation *
+          Math.sin(angle) +
+          d *
           0.30 *
           Math.cos(
             angle * 2.0
           );
 
         break;
-
     }
 
-
     return {
-      x: x,
-      y: y
+      x,
+      y
     };
-
   }
 
-
   /* ==========================================================
-     CALCULATE SAFE ORBIT SCALE
-
-     Rather than clamp animated positions at the edges, sample
-     the complete requested orbit and find its maximum extent.
-
-     We then scale the whole orbit uniformly so every point
-     remains within the chart.
-
-     This preserves the shape and smoothness of the path.
+     SAFE ORBIT CALCULATION
      ========================================================== */
 
-  function calculateSafeOrbitScale(
-    particle
-  ) {
+  function calculateSafeOrbitScale(star) {
+    const samples = 360;
 
-    const samples =
-      720;
+    let minX = Infinity;
+    let maxX = -Infinity;
 
+    let minY = Infinity;
+    let maxY = -Infinity;
 
-    let minOffsetX =
-      Infinity;
-
-    let maxOffsetX =
-      -Infinity;
-
-    let minOffsetY =
-      Infinity;
-
-    let maxOffsetY =
-      -Infinity;
-
-
-    const cosRotation =
+    const cosR =
       Math.cos(
-        particle.eridanusRotation
+        star.rotation
       );
 
-
-    const sinRotation =
+    const sinR =
       Math.sin(
-        particle.eridanusRotation
+        star.rotation
       );
-
 
     for (
       let i = 0;
       i < samples;
       i += 1
     ) {
-
       const angle =
         (
           i /
@@ -993,1043 +541,1578 @@
         Math.PI *
         2;
 
-
       const point =
         getOrbitPoint(
-          particle,
+          star,
           angle
         );
 
-
       const localX =
         point.x *
-        particle.eridanusRequestedRadiusX;
-
+        star.radiusX;
 
       const localY =
         point.y *
-        particle.eridanusRequestedRadiusY;
-
+        star.radiusY;
 
       const rotatedX =
         localX *
-        cosRotation
-        -
+        cosR -
         localY *
-        sinRotation;
-
+        sinR;
 
       const rotatedY =
         localX *
-        sinRotation
-        +
+        sinR +
         localY *
-        cosRotation;
+        cosR;
 
-
-      minOffsetX =
+      minX =
         Math.min(
-          minOffsetX,
+          minX,
           rotatedX
         );
 
-
-      maxOffsetX =
+      maxX =
         Math.max(
-          maxOffsetX,
+          maxX,
           rotatedX
         );
 
-
-      minOffsetY =
+      minY =
         Math.min(
-          minOffsetY,
+          minY,
           rotatedY
         );
 
-
-      maxOffsetY =
+      maxY =
         Math.max(
-          maxOffsetY,
+          maxY,
           rotatedY
         );
-
     }
 
-
-    /* --------------------------------------------------------
-       AVAILABLE SPACE AROUND THIS STAR'S HOME
-       -------------------------------------------------------- */
+    let scale = 1;
 
     const availableLeft =
-      particle.eridanusHomeX -
-      SAFE_LEFT;
-
+      star.x -
+      SAFE.left;
 
     const availableRight =
-      SAFE_RIGHT -
-      particle.eridanusHomeX;
-
+      SAFE.right -
+      star.x;
 
     const availableTop =
-      particle.eridanusHomeY -
-      SAFE_TOP;
-
+      star.y -
+      SAFE.top;
 
     const availableBottom =
-      SAFE_BOTTOM -
-      particle.eridanusHomeY;
+      SAFE.bottom -
+      star.y;
 
-
-    let scale =
-      1;
-
-
-    if (
-      minOffsetX < 0
-    ) {
-
+    if (minX < 0) {
       scale =
         Math.min(
           scale,
           availableLeft /
-          Math.abs(
-            minOffsetX
-          )
+          Math.abs(minX)
         );
-
     }
 
-
-    if (
-      maxOffsetX > 0
-    ) {
-
+    if (maxX > 0) {
       scale =
         Math.min(
           scale,
           availableRight /
-          maxOffsetX
+          maxX
         );
-
     }
 
-
-    if (
-      minOffsetY < 0
-    ) {
-
+    if (minY < 0) {
       scale =
         Math.min(
           scale,
           availableTop /
-          Math.abs(
-            minOffsetY
-          )
+          Math.abs(minY)
         );
-
     }
 
-
-    if (
-      maxOffsetY > 0
-    ) {
-
+    if (maxY > 0) {
       scale =
         Math.min(
           scale,
           availableBottom /
-          maxOffsetY
+          maxY
         );
-
     }
 
-
-    /*
-       Never enlarge beyond the requested orbit.
-
-       We only reduce it if necessary.
-    */
-
-    return Math.min(
-      1,
-      Math.max(
-        0,
+    return Math.max(
+      0,
+      Math.min(
+        1,
         scale
       )
     );
-
   }
-
 
   /* ==========================================================
-     PERSISTENCE
+     POSITION CALCULATION
      ========================================================== */
 
-  function saveParticleState(
-    instance
+  function positionNamedStar(
+    star,
+    seconds
   ) {
+    if (reduceMotion) {
+      return {
+        x:
+          star.x *
+          WIDTH,
 
-    try {
-
-      const state =
-        instance.particles.array.map(
-          function (particle) {
-
-            return {
-
-              x:
-                particle.x /
-                instance.canvas.w,
-
-              y:
-                particle.y /
-                instance.canvas.h,
-
-              vx:
-                particle.vx,
-
-              vy:
-                particle.vy,
-
-              radius:
-                particle.radius /
-                instance.canvas.w,
-
-              orbitPhase:
-                particle.eridanusOrbitPhase
-
-            };
-
-          }
-        );
-
-
-      sessionStorage.setItem(
-        'eridanus-particle-state',
-        JSON.stringify(state)
-      );
-
-    } catch (error) {
-
-      /*
-         Persistence is optional.
-      */
-
+        y:
+          star.y *
+          HEIGHT
+      };
     }
 
-  }
-
-
-  function restoreParticleState(
-    instance
-  ) {
-
-    let saved;
-
-
-    try {
-
-      saved =
-        sessionStorage.getItem(
-          'eridanus-particle-state'
-        );
-
-    } catch (error) {
-
-      return false;
-
-    }
-
-
-    if (!saved) {
-      return false;
-    }
-
-
-    let state;
-
-
-    try {
-
-      state =
-        JSON.parse(
-          saved
-        );
-
-    } catch (error) {
-
-      return false;
-
-    }
-
-
-    if (
-      !Array.isArray(
-        state
-      )
-    ) {
-      return false;
-    }
-
-
-    instance.particles.array.forEach(
-      function (
-        particle,
-        index
-      ) {
-
-        const old =
-          state[index];
-
-
-        if (!old) {
-          return;
-        }
-
-
-        particle.x =
-          old.x *
-          instance.canvas.w;
-
-
-        particle.y =
-          old.y *
-          instance.canvas.h;
-
-
-        if (
-          Number.isFinite(
-            old.vx
-          )
-        ) {
-
-          particle.vx =
-            old.vx;
-
-        }
-
-
-        if (
-          Number.isFinite(
-            old.vy
-          )
-        ) {
-
-          particle.vy =
-            old.vy;
-
-        }
-
-
-        if (
-          Number.isFinite(
-            old.radius
-          )
-        ) {
-
-          particle.radius =
-            old.radius *
-            instance.canvas.w;
-
-        }
-
-
-        if (
-          Number.isFinite(
-            old.orbitPhase
-          )
-        ) {
-
-          particle.eridanusOrbitPhase =
-            old.orbitPhase;
-
-        }
-
-      }
-    );
-
-
-    return true;
-
-  }
-
-
-  /* ==========================================================
-     WAIT FOR PARTICLES.JS
-     ========================================================== */
-
-  function initialiseNamedParticles() {
-
-    const check =
-      window.setInterval(
-        function () {
-
-          if (
-            !window.pJSDom ||
-            !window.pJSDom.length
-          ) {
-            return;
-          }
-
-
-          const instance =
-            window.pJSDom[
-              window.pJSDom.length - 1
-            ].pJS;
-
-
-          if (
-            !instance ||
-            !instance.particles ||
-            !instance.particles.array ||
-            instance.particles.array.length < 9
-          ) {
-            return;
-          }
-
-
-          window.clearInterval(
-            check
-          );
-
-
-          setupNamedParticles(
-            instance
-          );
-
-        },
-        50
+    const angle =
+      star.phase +
+      seconds *
+      star.speed;
+
+    const point =
+      getOrbitPoint(
+        star,
+        angle
       );
 
-  }
+    const scale =
+      star.orbitScale;
 
+    const localX =
+      point.x *
+      star.radiusX *
+      scale;
 
-  /* ==========================================================
-     NAMED PARTICLE SETUP
-     ========================================================== */
+    const localY =
+      point.y *
+      star.radiusY *
+      scale;
 
-  function setupNamedParticles(
-    instance
-  ) {
-
-    const particles =
-      instance.particles.array;
-
-
-    const namedParticles = {
-
-      cursa:
-        particles[0],
-
-      beid:
-        particles[1],
-
-      keid:
-        particles[2],
-
-      rana:
-        particles[3],
-
-      azha:
-        particles[4],
-
-      zaurak:
-        particles[5],
-
-      angetenar:
-        particles[6],
-
-      acamar:
-        particles[7],
-
-      achernar:
-        particles[8]
-
-    };
-
-
-    const restored =
-      restoreParticleState(
-        instance
+    const cosR =
+      Math.cos(
+        star.rotation
       );
 
-
-    const namedCount =
-      Object.keys(
-        namedParticles
-      ).length;
-
-
-    Object.entries(
-      namedParticles
-    )
-      .forEach(
-        function (
-          [name, particle],
-          index
-        ) {
-
-          const config =
-            namedStarConfig[name];
-
-
-          /* --------------------------------------------------
-             HOME
-             -------------------------------------------------- */
-
-          particle.eridanusHomeX =
-            config.x;
-
-
-          particle.eridanusHomeY =
-            config.y;
-
-
-          /* --------------------------------------------------
-             PATH CHARACTER
-             -------------------------------------------------- */
-
-          particle.eridanusPath =
-            config.path;
-
-
-          particle.eridanusRequestedRadiusX =
-            config.radiusX;
-
-
-          particle.eridanusRequestedRadiusY =
-            config.radiusY;
-
-
-          particle.eridanusRotation =
-            config.rotation;
-
-
-          particle.eridanusOrbitSpeed =
-            config.speed;
-
-
-          particle.eridanusDeformation =
-            config.deformation;
-
-
-          /* --------------------------------------------------
-             PHASE
-
-             Different initial phases stop the constellation
-             looking synchronized.
-             -------------------------------------------------- */
-
-          if (
-            !Number.isFinite(
-              particle.eridanusOrbitPhase
-            )
-          ) {
-
-            particle.eridanusOrbitPhase =
-              (
-                index /
-                namedCount
-              ) *
-              Math.PI *
-              2;
-
-          }
-
-
-          /* --------------------------------------------------
-             SAFE ORBIT
-
-             Calculate once because the geometry is normalized
-             and therefore survives responsive resizing.
-             -------------------------------------------------- */
-
-          particle.eridanusOrbitScale =
-            calculateSafeOrbitScale(
-              particle
-            );
-
-
-          /* --------------------------------------------------
-             INITIAL STAR SIZE
-             -------------------------------------------------- */
-
-          particle.eridanusRadius =
-            config.r;
-
-
-          if (!restored) {
-
-            particle.x =
-              config.x *
-              instance.canvas.w;
-
-
-            particle.y =
-              config.y *
-              instance.canvas.h;
-
-          }
-
-
-          /*
-             Named particles do not use particles.js velocity.
-          */
-
-          particle.vx =
-            0;
-
-
-          particle.vy =
-            0;
-
-        }
+    const sinR =
+      Math.sin(
+        star.rotation
       );
 
-
-    /* ========================================================
-       AZHA COLOUR
-       ======================================================== */
-
-    namedParticles.azha.color = {
-
-      rgb: {
-        r: 217,
-        g: 150,
-        b: 47
-      }
-
-    };
-
-
-    /* ========================================================
-       SAVE STATE
-       ======================================================== */
-
-    window.addEventListener(
-      'pagehide',
-      function () {
-
-        saveParticleState(
-          instance
-        );
-
-      },
-      {
-        once: true
-      }
-    );
-
-
-    initialiseLabels(
-      instance,
-      namedParticles
-    );
-
-  }
-
-
-  /* ==========================================================
-     SMOOTH INDEPENDENT NAMED-STAR MOTION
-
-     This is deliberately NOT physics.
-
-     Every star simply evaluates its own continuous path.
-
-     Therefore:
-       - no overshoot
-       - no spring effect
-       - no gravity
-       - no pendulum
-       - no inter-star influence
-       - no boundary bounce
-     ========================================================== */
-
-  function guideNamedParticles(
-    instance,
-    namedParticles
-  ) {
-
-    Object.values(
-      namedParticles
-    )
-      .forEach(
-        function (particle) {
-
-
-          /* --------------------------------------------------
-             ADVANCE INDIVIDUAL ORBIT
-             -------------------------------------------------- */
-
-          particle.eridanusOrbitPhase +=
-            particle.eridanusOrbitSpeed;
-
-
-          const angle =
-            particle.eridanusOrbitPhase;
-
-
-          /* --------------------------------------------------
-             GET THIS STAR'S UNIQUE PATH
-             -------------------------------------------------- */
-
-          const pathPoint =
-            getOrbitPoint(
-              particle,
-              angle
-            );
-
-
-          const scale =
-            particle.eridanusOrbitScale;
-
-
-          /* --------------------------------------------------
-             APPLY REQUESTED ORBIT DIMENSIONS
-             -------------------------------------------------- */
-
-          const localX =
-            pathPoint.x *
-            particle.eridanusRequestedRadiusX *
-            scale;
-
-
-          const localY =
-            pathPoint.y *
-            particle.eridanusRequestedRadiusY *
-            scale;
-
-
-          /* --------------------------------------------------
-             ROTATE ORBIT
-
-             This prevents every path from lying horizontally.
-             -------------------------------------------------- */
-
-          const cosRotation =
-            Math.cos(
-              particle.eridanusRotation
-            );
-
-
-          const sinRotation =
-            Math.sin(
-              particle.eridanusRotation
-            );
-
-
-          const rotatedX =
-            localX *
-            cosRotation
-            -
-            localY *
-            sinRotation;
-
-
-          const rotatedY =
-            localX *
-            sinRotation
-            +
-            localY *
-            cosRotation;
-
-
-          /* --------------------------------------------------
-             FINAL NORMALIZED POSITION
-
-             No clamp is required.
-
-             calculateSafeOrbitScale() guarantees these remain
-             within our safe chart area.
-             -------------------------------------------------- */
-
-          const normalizedX =
-            particle.eridanusHomeX +
-            rotatedX;
-
-
-          const normalizedY =
-            particle.eridanusHomeY +
-            rotatedY;
-
-
-          /* --------------------------------------------------
-             CONVERT TO CURRENT CANVAS
-
-             This automatically adapts to responsive resizing.
-             -------------------------------------------------- */
-
-          particle.x =
-            normalizedX *
-            instance.canvas.w;
-
-
-          particle.y =
-            normalizedY *
-            instance.canvas.h;
-
-
-          /*
-             Prevent particles.js motion from fighting the
-             authored orbit.
-          */
-
-          particle.vx =
-            0;
-
-
-          particle.vy =
-            0;
-
-
-          /*
-             Responsive named-star radius.
-          */
-
-          particle.radius =
-            particle.eridanusRadius *
-            (
-              instance.canvas.w /
-              260
-            );
-
-        }
-      );
-
-  }
-
-
-  /* ==========================================================
-     CANVAS → SVG
-     ========================================================== */
-
-  function canvasToSvg(
-    instance,
-    particle
-  ) {
+    const rotatedX =
+      localX *
+      cosR -
+      localY *
+      sinR;
+
+    const rotatedY =
+      localX *
+      sinR +
+      localY *
+      cosR;
 
     return {
-
       x:
         (
-          particle.x /
-          instance.canvas.w
+          star.x +
+          rotatedX
         ) *
-        260,
-
+        WIDTH,
 
       y:
         (
-          particle.y /
-          instance.canvas.h
+          star.y +
+          rotatedY
         ) *
-        110
-
+        HEIGHT
     };
-
   }
 
-
   /* ==========================================================
-     LABELS
+     BRIDGE STARS
+
+     Anonymous stars:
+       - have no labels
+       - have deterministic but irregular trajectories
+       - softly fade in/out
+       - participate in the graph
      ========================================================== */
 
-  function initialiseLabels(
-    instance,
-    namedParticles
+  function createBridgeStars(count) {
+    const paths = [
+      'ellipse',
+      'flow',
+      'wave',
+      'loop'
+    ];
+
+    const bridges = {};
+
+    for (
+      let i = 0;
+      i < count;
+      i += 1
+    ) {
+      const id =
+        `bridge-${i + 1}`;
+
+      const homeX =
+        0.08 +
+        seeded(i, 0) *
+        0.84;
+
+      const homeY =
+        0.12 +
+        seeded(i, 1) *
+        0.76;
+
+      const path =
+        paths[
+          Math.floor(
+            seeded(i, 2) *
+            paths.length
+          ) %
+          paths.length
+        ];
+
+      const direction =
+        seeded(i, 3) > 0.5
+          ? 1
+          : -1;
+
+      const star = {
+        id,
+        named: false,
+
+        x: homeX,
+        y: homeY,
+
+        r:
+          CONFIG.bridgeStars.minRadius +
+          seeded(i, 4) *
+          (
+            CONFIG.bridgeStars.maxRadius -
+            CONFIG.bridgeStars.minRadius
+          ),
+
+        path,
+
+        radiusX:
+          0.025 +
+          seeded(i, 5) *
+          0.055,
+
+        radiusY:
+          0.018 +
+          seeded(i, 6) *
+          0.040,
+
+        rotation:
+          -0.6 +
+          seeded(i, 7) *
+          1.2,
+
+        speed:
+          direction *
+          (
+            0.055 +
+            seeded(i, 8) *
+            0.085
+          ),
+
+        deformation:
+          0.08 +
+          seeded(i, 9) *
+          0.15,
+
+        phase:
+          seeded(i, 10) *
+          Math.PI *
+          2,
+
+        fadePhase:
+          seeded(i, 11) *
+          Math.PI *
+          2,
+
+        fadePeriod:
+          CONFIG.bridgeStars.fadeMinSeconds +
+          seeded(i, 12) *
+          (
+            CONFIG.bridgeStars.fadeMaxSeconds -
+            CONFIG.bridgeStars.fadeMinSeconds
+          )
+      };
+
+      star.orbitScale =
+        calculateSafeOrbitScale(
+          star
+        );
+
+      bridges[id] =
+        star;
+    }
+
+    return bridges;
+  }
+
+  function bridgeVisibility(
+    star,
+    seconds
   ) {
+    if (reduceMotion) {
+      return 0.22;
+    }
 
-    const labelElements =
-      {};
+    const wave =
+      0.5 +
+      0.5 *
+      Math.sin(
+        (
+          seconds /
+          star.fadePeriod
+        ) *
+        Math.PI *
+        2 +
+        star.fadePhase
+      );
 
+    /*
+       Smoothstep-like shaping.
+    */
+    const shaped =
+      wave *
+      wave *
+      (
+        3 -
+        2 *
+        wave
+      );
 
-    labels.forEach(
-      function (label) {
+    return (
+      CONFIG.bridgeStars.minOpacity +
+      shaped *
+      (
+        CONFIG.bridgeStars.maxOpacity -
+        CONFIG.bridgeStars.minOpacity
+      )
+    );
+  }
 
-        const english =
-          makeEl(
+  function distance(a, b) {
+    return Math.hypot(
+      a.x - b.x,
+      a.y - b.y
+    );
+  }
+
+  /* ==========================================================
+     BUILD SVG SCENE
+     ========================================================== */
+
+  svg.setAttribute(
+    'viewBox',
+    `0 0 ${WIDTH} ${HEIGHT}`
+  );
+
+  svg.setAttribute(
+    'preserveAspectRatio',
+    'xMidYMid meet'
+  );
+
+  /*
+     Clear any old markup from previous versions.
+  */
+  svg.textContent = '';
+
+  const edgeLayer =
+    createSvg(
+      'g',
+      {
+        class:
+          'chart-edges'
+      },
+      svg
+    );
+
+  const bridgeLayer =
+    createSvg(
+      'g',
+      {
+        class:
+          'chart-bridge-stars'
+      },
+      svg
+    );
+
+  const namedLayer =
+    createSvg(
+      'g',
+      {
+        class:
+          'chart-named-stars'
+      },
+      svg
+    );
+
+  const labelLayer =
+    createSvg(
+      'g',
+      {
+        class:
+          'chart-labels'
+      },
+      svg
+    );
+
+  /* ==========================================================
+     INITIALISE NAMED STARS
+     ========================================================== */
+
+  const namedStars = {};
+
+  const namedNames =
+    Object.keys(
+      namedStarConfig
+    );
+
+  namedNames.forEach(
+    (name, index) => {
+      const config =
+        namedStarConfig[name];
+
+      const star = {
+        ...config,
+
+        id: name,
+        named: true,
+
+        phase:
+          (
+            index /
+            namedNames.length
+          ) *
+          Math.PI *
+          2
+      };
+
+      star.orbitScale =
+        calculateSafeOrbitScale(
+          star
+        );
+
+      namedStars[name] =
+        star;
+    }
+  );
+
+  const bridgeStars =
+    CONFIG.bridgeStars.enabled
+      ? createBridgeStars(
+          CONFIG.bridgeStars.count
+        )
+      : {};
+
+  const allStars = {
+    ...namedStars,
+    ...bridgeStars
+  };
+
+  const allNames =
+    Object.keys(
+      allStars
+    );
+
+  /* ==========================================================
+     RUNTIME STATE
+     ========================================================== */
+
+  const runtime = {
+    positions: {},
+    visibility: {},
+
+    /*
+       Map allows graph edges to persist independently from
+       each frame's set of active pairs.
+    */
+    edges:
+      new Map(),
+
+    labels: {},
+
+    raf: 0,
+
+    running: false,
+
+    elapsedMs: 0,
+    lastStartedAt: 0
+  };
+
+  /* ==========================================================
+     CREATE BRIDGE STAR ELEMENTS
+     ========================================================== */
+
+  Object.values(
+    bridgeStars
+  ).forEach(
+    (star) => {
+      star.element =
+        createSvg(
+          'circle',
+          {
+            class:
+              'chart-bridge-star',
+
+            cx:
+              star.x *
+              WIDTH,
+
+            cy:
+              star.y *
+              HEIGHT,
+
+            r:
+              star.r,
+
+            opacity:
+              CONFIG.bridgeStars.minOpacity
+          },
+          bridgeLayer
+        );
+    }
+  );
+
+  /* ==========================================================
+     CREATE NAMED STARS + LABELS
+     ========================================================== */
+
+  Object.values(
+    namedStars
+  ).forEach(
+    (star) => {
+
+      /*
+         Azha gets a very subtle breathing halo.
+      */
+      if (star.primary) {
+        star.halo =
+          createSvg(
+            'circle',
+            {
+              class:
+                'chart-star-halo',
+
+              cx:
+                star.x *
+                WIDTH,
+
+              cy:
+                star.y *
+                HEIGHT,
+
+              r:
+                star.r *
+                2.25
+            },
+            namedLayer
+          );
+      }
+
+      star.element =
+        createSvg(
+          'circle',
+          {
+            class:
+              `chart-star${
+                star.primary
+                  ? ' chart-star--azha'
+                  : ''
+              }`,
+
+            cx:
+              star.x *
+              WIDTH,
+
+            cy:
+              star.y *
+              HEIGHT,
+
+            r:
+              star.r
+          },
+          namedLayer
+        );
+
+      /*
+         One SVG group owns the whole bilingual label.
+
+         English, separator and Arabic therefore always share:
+           - position
+           - color
+           - opacity
+           - connectivity fading
+      */
+      const group =
+        createSvg(
+          'g',
+          {
+            class:
+              `chart-label-group chart-label-${star.id}`,
+
+            opacity:
+              star.baseLabelOpacity
+          },
+          labelLayer
+        );
+
+      const english =
+        createSvg(
+          'text',
+          {
+            class:
+              'chart-label chart-label-english',
+
+            'font-size':
+              star.size,
+
+            x: 0,
+            y: 0
+          },
+          group
+        );
+
+      english.textContent =
+        star.label;
+
+      let separator = null;
+      let arabic = null;
+
+      if (star.arabic) {
+        separator =
+          createSvg(
             'text',
             {
-
               class:
-                `chart-label chart-label-${label.star}`,
-
-              'text-anchor':
-                label.anchor,
+                'chart-label chart-label-separator',
 
               'font-size':
-                label.size,
+                star.size,
 
-              opacity:
-                label.opacity
-
+              x: 0,
+              y: 0
             },
-            labelsG
+            group
           );
 
+        separator.textContent =
+          CONFIG.labels.separator;
 
-        english.textContent =
-          label.text;
+        arabic =
+          createSvg(
+            'text',
+            {
+              class:
+                'chart-label chart-label-arabic',
 
+              'font-size':
+                star.size *
+                CONFIG.labels.arabicScale,
 
-        let arabic =
-          null;
+              direction:
+                'rtl',
 
+              'unicode-bidi':
+                'isolate',
 
-        if (
-          label.arabic
-        ) {
+              x: 0,
+              y: 0
+            },
+            group
+          );
 
-          arabic =
-            makeEl(
-              'text',
-              {
+        arabic.textContent =
+          star.arabic;
+      }
 
-                class:
-                  `chart-label chart-label-arabic chart-label-${label.star}`,
+      runtime.labels[
+        star.id
+      ] = {
+        group,
+        english,
+        separator,
+        arabic,
 
-                'text-anchor':
-                  label.anchor,
+        opacity:
+          star.baseLabelOpacity,
 
-                'font-size':
-                  label.arabicSize,
+        totalWidth: 0,
+        anchorOffset: 0
+      };
+    }
+  );
 
-                opacity:
-                  label.opacity *
-                  0.68,
+  /* ==========================================================
+     LABEL LAYOUT
 
-                direction:
-                  'rtl'
+     Each script is measured independently so mixed LTR / RTL
+     remains predictable across browsers and fonts.
 
-              },
-              labelsG
+     Result:
+       Azha · ازها
+     ========================================================== */
+
+  function layoutLabel(name) {
+    const star =
+      namedStars[name];
+
+    const label =
+      runtime.labels[name];
+
+    if (
+      !star ||
+      !label
+    ) {
+      return;
+    }
+
+    const englishBox =
+      label.english
+        .getBBox();
+
+    const separatorBox =
+      label.separator
+        ? label.separator
+            .getBBox()
+        : null;
+
+    const arabicBox =
+      label.arabic
+        ? label.arabic
+            .getBBox()
+        : null;
+
+    const englishWidth =
+      englishBox.width;
+
+    const separatorWidth =
+      separatorBox
+        ? separatorBox.width
+        : 0;
+
+    const arabicWidth =
+      arabicBox
+        ? arabicBox.width
+        : 0;
+
+    const gap =
+      label.arabic
+        ? CONFIG.labels.gap
+        : 0;
+
+    const total =
+      englishWidth +
+      separatorWidth +
+      arabicWidth +
+      gap;
+
+    label.totalWidth =
+      total;
+
+    /*
+       The whole bilingual label behaves as one block.
+    */
+    label.anchorOffset =
+      star.anchor === 'end'
+        ? -total
+        : 0;
+
+    /*
+       Correct for each element's actual rendered bounding box.
+    */
+    label.english
+      .setAttribute(
+        'transform',
+        `translate(${
+          -englishBox.x
+        } 0)`
+      );
+
+    if (
+      label.separator &&
+      separatorBox
+    ) {
+      const separatorLeft =
+        englishWidth;
+
+      label.separator
+        .setAttribute(
+          'transform',
+          `translate(${
+            separatorLeft -
+            separatorBox.x
+          } 0)`
+        );
+    }
+
+    if (
+      label.arabic &&
+      arabicBox
+    ) {
+      const arabicLeft =
+        englishWidth +
+        separatorWidth +
+        gap;
+
+      label.arabic
+        .setAttribute(
+          'transform',
+          `translate(${
+            arabicLeft -
+            arabicBox.x
+          } 0)`
+        );
+    }
+  }
+
+  function layoutAllLabels() {
+    namedNames.forEach(
+      layoutLabel
+    );
+  }
+
+  /*
+     Initial layout.
+  */
+  layoutAllLabels();
+
+  /*
+     Re-measure after webfonts are available because the width
+     of Fraunces/system Arabic fonts can differ substantially
+     from fallback metrics.
+  */
+  if (
+    document.fonts &&
+    document.fonts.ready
+  ) {
+    document.fonts.ready
+      .then(
+        layoutAllLabels
+      )
+      .catch(
+        () => {
+          /*
+             Fallback font layout is still valid.
+          */
+        }
+      );
+  }
+
+  /* ==========================================================
+     GRAPH HELPERS
+     ========================================================== */
+
+  function edgeKey(a, b) {
+    return (
+      a < b
+        ? `${a}|${b}`
+        : `${b}|${a}`
+    );
+  }
+
+  function ensureEdge(a, b) {
+    const key =
+      edgeKey(a, b);
+
+    let edge =
+      runtime.edges
+        .get(key);
+
+    if (!edge) {
+      const line =
+        createSvg(
+          'line',
+          {
+            class:
+              'chart-edge',
+
+            x1: 0,
+            y1: 0,
+
+            x2: 0,
+            y2: 0,
+
+            opacity: 0
+          },
+          edgeLayer
+        );
+
+      edge = {
+        key,
+        a,
+        b,
+
+        line,
+
+        /*
+           latched = currently inside hysteresis relationship.
+        */
+        latched: false,
+
+        /*
+           selected = survives degree-limit filtering this frame.
+        */
+        selected: false,
+
+        opacity: 0,
+        targetOpacity: 0,
+
+        removeWhenHidden: false
+      };
+
+      runtime.edges.set(
+        key,
+        edge
+      );
+    }
+
+    return edge;
+  }
+
+  /* ==========================================================
+     UPDATE POSITIONS
+     ========================================================== */
+
+  function updatePositions(seconds) {
+    Object.values(
+      namedStars
+    ).forEach(
+      (star) => {
+        const pos =
+          positionNamedStar(
+            star,
+            seconds
+          );
+
+        runtime.positions[
+          star.id
+        ] = pos;
+
+        runtime.visibility[
+          star.id
+        ] = 1;
+
+        star.element
+          .setAttribute(
+            'cx',
+            pos.x.toFixed(2)
+          );
+
+        star.element
+          .setAttribute(
+            'cy',
+            pos.y.toFixed(2)
+          );
+
+        /*
+           Azha remains stable, with just a tiny halo breath.
+        */
+        if (star.halo) {
+          const breath =
+            reduceMotion
+              ? 1
+              :
+                1 +
+                Math.sin(
+                  seconds *
+                  0.55
+                ) *
+                0.035;
+
+          star.halo
+            .setAttribute(
+              'cx',
+              pos.x.toFixed(2)
             );
 
+          star.halo
+            .setAttribute(
+              'cy',
+              pos.y.toFixed(2)
+            );
 
-          arabic.textContent =
-            label.arabic;
-
+          star.halo
+            .setAttribute(
+              'r',
+              (
+                star.r *
+                2.25 *
+                breath
+              ).toFixed(2)
+            );
         }
-
-
-        labelElements[
-          label.star
-        ] = {
-
-          english:
-            english,
-
-          arabic:
-            arabic,
-
-          config:
-            label
-
-        };
-
       }
     );
 
+    Object.values(
+      bridgeStars
+    ).forEach(
+      (star) => {
+        const pos =
+          positionNamedStar(
+            star,
+            seconds
+          );
 
-    /* ========================================================
-       ANIMATION LOOP
-       ======================================================== */
+        const visibility =
+          bridgeVisibility(
+            star,
+            seconds
+          );
 
-    function updateLabels() {
+        runtime.positions[
+          star.id
+        ] = pos;
 
-      /* ------------------------------------------------------
-         MOVE NAMED STARS
-         ------------------------------------------------------ */
+        runtime.visibility[
+          star.id
+        ] = visibility;
 
-      guideNamedParticles(
-        instance,
-        namedParticles
-      );
+        star.element
+          .setAttribute(
+            'cx',
+            pos.x.toFixed(2)
+          );
 
+        star.element
+          .setAttribute(
+            'cy',
+            pos.y.toFixed(2)
+          );
 
-      /* ------------------------------------------------------
-         MOVE LABELS WITH THEIR STARS
-         ------------------------------------------------------ */
-
-      Object.entries(
-        labelElements
-      )
-        .forEach(
-          function (
-            [name, label]
-          ) {
-
-            const particle =
-              namedParticles[name];
-
-
-            const point =
-              canvasToSvg(
-                instance,
-                particle
-              );
-
-
-            label.english.setAttribute(
-              'x',
-              point.x +
-              label.config.dx
-            );
-
-
-            label.english.setAttribute(
-              'y',
-              point.y +
-              label.config.dy
-            );
-
-
-            if (
-              label.arabic
-            ) {
-
-              label.arabic.setAttribute(
-                'x',
-                point.x +
-                label.config.adx
-              );
-
-
-              label.arabic.setAttribute(
-                'y',
-                point.y +
-                label.config.ady
-              );
-
-            }
-
-          }
-        );
-
-
-      requestAnimationFrame(
-        updateLabels
-      );
-
-    }
-
-
-    updateLabels();
-
+        star.element
+          .setAttribute(
+            'opacity',
+            visibility.toFixed(3)
+          );
+      }
+    );
   }
-
 
   /* ==========================================================
-     START
+     DYNAMIC PROXIMITY GRAPH
+
+     This recreates the important "living" quality from the old
+     particles.js version:
+
+       - new edges can emerge
+       - old edges can die
+       - any nearby nodes may connect
+       - topology evolves continuously
+
+     Improvements over raw particle proximity:
+       - hysteresis
+       - maximum degree
+       - edge fading
+       - bridge visibility affects line visibility
      ========================================================== */
 
-  if (
-    !reduceMotion
-  ) {
+  function updateGraph() {
+    const degrees = {};
+    const connectivity = {};
+    const eligible = [];
 
-    initialiseNamedParticles();
+    allNames.forEach(
+      (name) => {
+        degrees[name] = 0;
+        connectivity[name] = 0;
+      }
+    );
 
+    /*
+       Reset selection each frame, but retain hysteresis state.
+    */
+    runtime.edges.forEach(
+      (edge) => {
+        edge.selected = false;
+        edge.targetOpacity = 0;
+      }
+    );
+
+    /*
+       Evaluate every pair.
+
+       With 21 nodes this is only 210 pairs — trivial for the
+       browser and considerably smaller than most particle
+       simulations.
+    */
+    for (
+      let i = 0;
+      i < allNames.length;
+      i += 1
+    ) {
+      for (
+        let j = i + 1;
+        j < allNames.length;
+        j += 1
+      ) {
+        const a =
+          allNames[i];
+
+        const b =
+          allNames[j];
+
+        const pa =
+          runtime.positions[a];
+
+        const pb =
+          runtime.positions[b];
+
+        const d =
+          distance(
+            pa,
+            pb
+          );
+
+        const key =
+          edgeKey(
+            a,
+            b
+          );
+
+        let edge =
+          runtime.edges
+            .get(key);
+
+        /*
+           Disconnect only after the wider threshold.
+        */
+        if (
+          edge &&
+          edge.latched &&
+          d >
+          CONFIG.graph.disconnectAt
+        ) {
+          edge.latched =
+            false;
+        }
+
+        /*
+           Create / reconnect inside the tighter threshold.
+        */
+        if (
+          (
+            !edge ||
+            !edge.latched
+          ) &&
+          d <
+          CONFIG.graph.connectAt
+        ) {
+          edge =
+            edge ||
+            ensureEdge(
+              a,
+              b
+            );
+
+          edge.latched =
+            true;
+
+          edge.removeWhenHidden =
+            false;
+        }
+
+        if (
+          edge &&
+          edge.latched
+        ) {
+          eligible.push({
+            a,
+            b,
+            d,
+            edge
+          });
+        } else if (edge) {
+          edge.removeWhenHidden =
+            true;
+        }
+      }
+    }
+
+    /*
+       Prefer the shortest/local relationships when degree
+       limits are reached.
+    */
+    eligible.sort(
+      (x, y) =>
+        x.d -
+        y.d
+    );
+
+    function maxDegree(name) {
+      return allStars[name].named
+        ? CONFIG.graph.maxNamedConnections
+        : CONFIG.bridgeStars.maxConnections;
+    }
+
+    eligible.forEach(
+      ({
+        a,
+        b,
+        d,
+        edge
+      }) => {
+        if (
+          degrees[a] >=
+          maxDegree(a) ||
+          degrees[b] >=
+          maxDegree(b)
+        ) {
+          return;
+        }
+
+        edge.selected =
+          true;
+
+        edge.removeWhenHidden =
+          false;
+
+        /*
+           Stronger when closer.
+        */
+        const distanceStrength =
+          clamp01(
+            1 -
+            (
+              d -
+              8
+            ) /
+            (
+              CONFIG.graph.disconnectAt -
+              8
+            )
+          );
+
+        /*
+           Faint bridge stars should not have disproportionately
+           strong connections.
+        */
+        const visibilityStrength =
+          Math.min(
+            runtime.visibility[a],
+            runtime.visibility[b]
+          );
+
+        const strength =
+          distanceStrength *
+          visibilityStrength;
+
+        edge.targetOpacity =
+          CONFIG.graph.minEdgeOpacity +
+          strength *
+          (
+            CONFIG.graph.maxEdgeOpacity -
+            CONFIG.graph.minEdgeOpacity
+          );
+
+        degrees[a] += 1;
+        degrees[b] += 1;
+
+        /*
+           Connectivity drives named-label prominence.
+        */
+        connectivity[a] +=
+          strength;
+
+        connectivity[b] +=
+          strength;
+      }
+    );
+
+    /* ========================================================
+       FADE / REMOVE EDGES
+       ======================================================== */
+
+    runtime.edges.forEach(
+      (edge) => {
+        if (!edge.selected) {
+          edge.targetOpacity =
+            0;
+        }
+
+        edge.opacity =
+          lerp(
+            edge.opacity,
+            edge.targetOpacity,
+
+            reduceMotion
+              ? 1
+              :
+                CONFIG.graph.fadeSpeed
+          );
+
+        const a =
+          runtime.positions[
+            edge.a
+          ];
+
+        const b =
+          runtime.positions[
+            edge.b
+          ];
+
+        edge.line
+          .setAttribute(
+            'x1',
+            a.x.toFixed(2)
+          );
+
+        edge.line
+          .setAttribute(
+            'y1',
+            a.y.toFixed(2)
+          );
+
+        edge.line
+          .setAttribute(
+            'x2',
+            b.x.toFixed(2)
+          );
+
+        edge.line
+          .setAttribute(
+            'y2',
+            b.y.toFixed(2)
+          );
+
+        edge.line
+          .setAttribute(
+            'opacity',
+            edge.opacity.toFixed(3)
+          );
+
+        /*
+           Remove dead DOM lines once their fade completes.
+        */
+        if (
+          !edge.latched &&
+          edge.opacity <
+          0.002
+        ) {
+          edge.line.remove();
+
+          runtime.edges.delete(
+            edge.key
+          );
+        }
+      }
+    );
+
+    return connectivity;
   }
+
+  /* ==========================================================
+     CONNECTIVITY-DRIVEN LABELS
+     ========================================================== */
+
+  function updateLabels(
+    connectivity
+  ) {
+    namedNames.forEach(
+      (name) => {
+        const star =
+          namedStars[name];
+
+        const label =
+          runtime.labels[name];
+
+        const pos =
+          runtime.positions[name];
+
+        /*
+           Move the complete bilingual unit.
+        */
+        label.group
+          .setAttribute(
+            'transform',
+            `translate(${
+              (
+                pos.x +
+                star.dx +
+                label.anchorOffset
+              ).toFixed(2)
+            } ${
+              (
+                pos.y +
+                star.dy
+              ).toFixed(2)
+            })`
+          );
+
+        const importance =
+          clamp01(
+            connectivity[name] /
+            CONFIG.graph.labelInfluence
+          );
+
+        /*
+           Azha is always readable.
+
+           Secondary names emerge as their neighborhood becomes
+           more connected.
+        */
+        const targetOpacity =
+          star.primary
+            ? 0.96
+            :
+              Math.min(
+                CONFIG.labels.maxSecondaryOpacity,
+
+                star.baseLabelOpacity +
+                importance *
+                0.52
+              );
+
+        label.opacity =
+          lerp(
+            label.opacity,
+            targetOpacity,
+
+            reduceMotion
+              ? 1
+              :
+                CONFIG.labels.fadeSpeed
+          );
+
+        /*
+           Parent-group opacity means English, separator and
+           Arabic ALWAYS fade together.
+        */
+        label.group
+          .setAttribute(
+            'opacity',
+            label.opacity.toFixed(3)
+          );
+      }
+    );
+  }
+
+  /* ==========================================================
+     RENDER
+     ========================================================== */
+
+  function renderAt(milliseconds) {
+    const seconds =
+      milliseconds /
+      1000;
+
+    updatePositions(
+      seconds
+    );
+
+    const connectivity =
+      updateGraph();
+
+    updateLabels(
+      connectivity
+    );
+  }
+
+  /* ==========================================================
+     ANIMATION LIFECYCLE
+     ========================================================== */
+
+  function frame(now) {
+    if (!runtime.running) {
+      return;
+    }
+
+    const elapsed =
+      runtime.elapsedMs +
+      (
+        now -
+        runtime.lastStartedAt
+      );
+
+    renderAt(
+      elapsed
+    );
+
+    runtime.raf =
+      requestAnimationFrame(
+        frame
+      );
+  }
+
+  function start() {
+    if (
+      reduceMotion ||
+      runtime.running ||
+      document.hidden
+    ) {
+      return;
+    }
+
+    runtime.running =
+      true;
+
+    runtime.lastStartedAt =
+      performance.now();
+
+    runtime.raf =
+      requestAnimationFrame(
+        frame
+      );
+  }
+
+  function stop() {
+    if (!runtime.running) {
+      return;
+    }
+
+    runtime.elapsedMs +=
+      performance.now() -
+      runtime.lastStartedAt;
+
+    runtime.running =
+      false;
+
+    cancelAnimationFrame(
+      runtime.raf
+    );
+  }
+
+  /*
+     Always create a valid static first frame.
+  */
+  renderAt(0);
+
+  start();
+
+  /*
+     Don't animate hidden tabs.
+
+     This saves CPU and resumes at the same simulation time
+     when the user returns.
+  */
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+      }
+    }
+  );
 
 })();

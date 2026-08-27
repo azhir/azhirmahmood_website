@@ -289,7 +289,7 @@ body {
      Prevent decorative background geometry from extending
      outside the header.
   */
-  overflow: hidden;
+  overflow: visible;
 }
 
 
@@ -441,74 +441,175 @@ body {
 
   flex: 0 0 auto;
 }
+
+
+
+
+
+// /* ==========================================================
+//    ERIDANUS CHART — CONTAINER
+//    ========================================================== */
+
+// .chart-wrap {
+//   position: relative;
+//   flex: 0 1 clamp(260px, 32vw, 450px);
+//   width: clamp(260px, 32vw, 450px);
+//   max-width: 450px;
+
+//   /*
+//      Flatter chart:
+//      less unused sky above the named constellation.
+//   */
+//   aspect-ratio: 260 / 110;
+//   margin-left: auto;
+//   overflow: visible;
+// }
+
+
+// /* ==========================================================
+//    ERIDANUS CHART — PARTICLE FIELD
+//    ========================================================== */
+
+// .eridanus-particles {
+//   position: absolute;
+
+//   left: 0;
+//   right: 0;
+//   top: 2.2rem;
+//   bottom: 0;
+
+//   z-index: 1;
+
+//   width: 100%;
+
+//   overflow: hidden;
+
+//   pointer-events: none;
+// }
+
+
+// /*
+//    particles.js inserts this canvas automatically.
+// */
+// .eridanus-particles canvas {
+//   display: block;
+
+//   width: 100% !important;
+//   height: 100% !important;
+// }
+
+
+// /* ==========================================================
+//    ERIDANUS CHART — SVG LABEL LAYER
+//    ========================================================== */
+
+// .chart-svg {
+//   position: absolute;
+
+//   left: 0;
+//   right: 0;
+//   top: 2.2rem;
+//   bottom: 0;
+
+//   z-index: 2;
+
+//   width: 100%;
+
+//   display: block;
+
+//   overflow: visible;
+
+//   pointer-events: none;
+
+//   color: var(--brass);
+// }
+
+
+// /* ==========================================================
+//    ERIDANUS CHART — LABELS
+//    ========================================================== */
+
+// /*
+//    Labels sit above the particle canvas.
+
+//    The paper-coloured stroke creates a small cartographic halo
+//    around the lettering so graph lines cannot visually cut
+//    through the text.
+// */
+// .chart-label {
+//   fill: currentColor;
+
+//   font-family:
+//     Georgia,
+//     serif;
+
+//   font-style: italic;
+
+//   paint-order: stroke fill;
+
+//   stroke: var(--paper);
+//   stroke-width: 2.5px;
+
+//   stroke-linecap: round;
+//   stroke-linejoin: round;
+
+//   pointer-events: none;
+// }
+
+
+// /*
+//    Arabic labels remain upright.
+// */
+// .chart-label-arabic {
+//   font-style: normal;
+
+//   stroke-width: 2.3px;
+// }
+
+
+// /* ==========================================================
+//    ERIDANUS CHART — MOBILE
+//    ========================================================== */
+
+// @media (max-width: 800px) {
+//   .chart-wrap {
+//     display: none;
+//   }
+
+// }
+
+
 /* ==========================================================
-   ERIDANUS CHART — CONTAINER
+   ERIDANUS — LIVING CONSTELLATION
    ========================================================== */
 
 .chart-wrap {
   position: relative;
+  isolation: isolate;
+
   flex: 0 1 clamp(260px, 32vw, 450px);
   width: clamp(260px, 32vw, 450px);
   max-width: 450px;
 
-  /*
-     Flatter chart:
-     less unused sky above the named constellation.
-  */
   aspect-ratio: 260 / 110;
+
   margin-left: auto;
+
   overflow: visible;
+
+  /*
+     Give labels permission to paint outside
+     the chart's own layout box.
+  */
+  contain: layout;
 }
-
-
-/* ==========================================================
-   ERIDANUS CHART — PARTICLE FIELD
-   ========================================================== */
-
-.eridanus-particles {
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 2.2rem;
-  bottom: 0;
-
-  z-index: 1;
-
-  width: 100%;
-
-  overflow: hidden;
-
-  pointer-events: none;
-}
-
-
-/*
-   particles.js inserts this canvas automatically.
-*/
-.eridanus-particles canvas {
-  display: block;
-
-  width: 100% !important;
-  height: 100% !important;
-}
-
-
-/* ==========================================================
-   ERIDANUS CHART — SVG LABEL LAYER
-   ========================================================== */
 
 .chart-svg {
   position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 2.2rem;
-  bottom: 0;
-
-  z-index: 2;
+  inset: 0;
 
   width: 100%;
+  height: 100%;
 
   display: block;
 
@@ -521,52 +622,193 @@ body {
 
 
 /* ==========================================================
-   ERIDANUS CHART — LABELS
+   GRAPH EDGES
+   ========================================================== */
+
+.chart-edge {
+  fill: none;
+
+  stroke: var(--brass);
+
+  stroke-width: 0.72;
+
+  stroke-linecap: round;
+
+  /*
+     Keeps line thickness visually consistent as the SVG
+     responds to different screen sizes.
+  */
+  vector-effect: non-scaling-stroke;
+}
+
+
+/* ==========================================================
+   NAMED STARS
+   ========================================================== */
+
+.chart-star {
+  fill: var(--brass);
+
+  opacity: 0.76;
+}
+
+
+/*
+   Azha is deterministic.
+
+   It no longer inherits random particle.js colour, opacity,
+   or radius values.
+*/
+.chart-star--azha {
+  fill: #d9962f;
+
+  opacity: 0.98;
+}
+
+
+/*
+   Extremely subtle visual anchor around Azha.
+*/
+.chart-star-halo {
+  fill: #d9962f;
+
+  opacity: 0.07;
+}
+
+
+/* ==========================================================
+   UNNAMED / BRIDGE STARS
+   ========================================================== */
+
+.chart-bridge-star {
+  fill: var(--brass);
+}
+
+
+/* ==========================================================
+   LABEL GROUPS
    ========================================================== */
 
 /*
-   Labels sit above the particle canvas.
+   Colour and opacity belong to the bilingual GROUP.
 
-   The paper-coloured stroke creates a small cartographic halo
-   around the lettering so graph lines cannot visually cut
-   through the text.
+   Therefore:
+
+      Azha · ازها
+
+   always behaves as one visual object.
 */
-.chart-label {
-  fill: currentColor;
-
-  font-family:
-    Georgia,
-    serif;
-
-  font-style: italic;
-
-  paint-order: stroke fill;
-
-  stroke: var(--paper);
-  stroke-width: 2.5px;
-
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.chart-label-group {
+  color: var(--brass);
 
   pointer-events: none;
 }
 
 
 /*
-   Arabic labels remain upright.
+   Azha's entire bilingual label uses one colour.
 */
-.chart-label-arabic {
-  font-style: normal;
-
-  stroke-width: 2.3px;
+.chart-label-azha {
+  color: #b7771f;
 }
 
 
 /* ==========================================================
-   ERIDANUS CHART — MOBILE
+   LABEL TYPOGRAPHY
+   ========================================================== */
+
+.chart-label {
+  fill: currentColor;
+
+  /*
+     Cartographic paper halo so graph edges cannot visually
+     slice through the lettering.
+  */
+  stroke: var(--paper);
+
+  paint-order: stroke fill;
+
+  stroke-width: 1.5px;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  font-family:
+    "Fraunces",
+    Georgia,
+    serif;
+
+  font-style: italic;
+
+  font-weight: 400;
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+
+/*
+   Separator belongs to the bilingual unit but should not
+   inherit the English italic.
+*/
+.chart-label-separator {
+  font-style: normal;
+}
+
+
+/* ==========================================================
+   ARABIC
+
+   Arabic differs typographically, NOT chromatically.
+
+   It inherits:
+      fill: currentColor
+
+   from .chart-label, so it always matches the English.
+   ========================================================== */
+
+.chart-label-arabic {
+  font-family:
+    "Noto Naskh Arabic",
+    "Noto Serif Arabic",
+    "Geeza Pro",
+    "Traditional Arabic",
+    serif;
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  stroke-width: 1.35px;
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .chart-star-halo {
+    opacity: 0.055;
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+
+   Keep your current behaviour initially.
+
+   Once the desktop version is visually settled, I would
+   revisit this and consider showing a simplified Azha-only
+   signature on mobile.
    ========================================================== */
 
 @media (max-width: 800px) {
+
   .chart-wrap {
     display: none;
   }
