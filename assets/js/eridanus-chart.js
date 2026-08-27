@@ -1,21 +1,33 @@
 (function () {
 
   /* ==========================================================
-     ERIDANUS — PARTICLE CONSTELLATION
+     ERIDANUS — LIVING CONSTELLATION
      ==========================================================
 
-     particles.js handles:
-       - continuous particle movement
-       - naturally forming / disappearing connections
-       - the anonymous celestial field
+     DESIGN
 
-     This layer additionally:
-       - nominates real particles as named stars
-       - gives those stars authored home positions
-       - gently guides them toward those homes
-       - removes hard orbit / rubber-band behaviour
-       - lets labels follow them
-       - preserves particle state between site pages
+     particles.js:
+       - renders all stars
+       - moves anonymous/background stars
+       - draws proximity-based graph connections
+
+     Named stars:
+       - are still real particles.js particles
+       - follow independent mathematical paths
+       - do NOT exert forces on each other
+       - do NOT use springs, steering or gravity
+       - never bounce from chart boundaries
+
+     Each named star has:
+       - a normalized home position
+       - its own orbit/path type
+       - its own width and height
+       - its own rotation
+       - its own speed and direction
+       - subtle smooth path deformation
+
+     Requested paths are automatically reduced only when
+     necessary to guarantee they remain inside the chart.
      ========================================================== */
 
 
@@ -24,13 +36,19 @@
      ========================================================== */
 
   const svg =
-    document.getElementById('eridanus-chart');
+    document.getElementById(
+      'eridanus-chart'
+    );
 
   const particleField =
-    document.getElementById('eridanus-particles');
+    document.getElementById(
+      'eridanus-particles'
+    );
 
   const labelsG =
-    document.getElementById('eridanus-labels');
+    document.getElementById(
+      'eridanus-labels'
+    );
 
 
   if (
@@ -52,6 +70,33 @@
     ).matches;
 
 
+  /* ==========================================================
+     SAFE CHART BOUNDS
+
+     Named stars never cross these boundaries.
+
+     Because orbit dimensions are calculated in advance,
+     there is no clamp during animation and therefore no
+     flattened/janky edge motion.
+     ========================================================== */
+
+  const SAFE_LEFT =
+    0.025;
+
+  const SAFE_RIGHT =
+    0.975;
+
+  const SAFE_TOP =
+    0.055;
+
+  const SAFE_BOTTOM =
+    0.945;
+
+
+  /* ==========================================================
+     HELPERS
+     ========================================================== */
+
   function makeEl(
     tag,
     attrs,
@@ -65,9 +110,13 @@
       );
 
 
-    Object.entries(attrs)
+    Object.entries(
+      attrs
+    )
       .forEach(
-        function ([key, value]) {
+        function (
+          [key, value]
+        ) {
 
           el.setAttribute(
             key,
@@ -78,7 +127,9 @@
       );
 
 
-    parent.appendChild(el);
+    parent.appendChild(
+      el
+    );
 
 
     return el;
@@ -102,15 +153,15 @@
         particles: {
 
           /* --------------------------------------------------
-             PARTICLE COUNT
+             15 NODES
 
-             More = richer graph
-             Less = airier chart
+             9 named stars
+             6 anonymous bridge nodes
              -------------------------------------------------- */
 
           number: {
 
-            value: 34,
+            value: 15,
 
             density: {
               enable: false
@@ -119,18 +170,10 @@
           },
 
 
-          /* --------------------------------------------------
-             COLOUR
-             -------------------------------------------------- */
-
           color: {
             value: '#9b7a3c'
           },
 
-
-          /* --------------------------------------------------
-             SHAPE
-             -------------------------------------------------- */
 
           shape: {
 
@@ -144,17 +187,9 @@
           },
 
 
-          /* --------------------------------------------------
-             OPACITY
-
-             Particles themselves remain persistent.
-
-             The lines are the ephemeral part.
-             -------------------------------------------------- */
-
           opacity: {
 
-            value: 0.62,
+            value: 0.72,
 
             random: true,
 
@@ -167,13 +202,6 @@
 
           },
 
-
-          /* --------------------------------------------------
-             SIZE
-
-             Random sizing helps anonymous stars feel like the
-             same sky rather than uniform particles.
-             -------------------------------------------------- */
 
           size: {
 
@@ -192,11 +220,13 @@
 
 
           /* --------------------------------------------------
-             CONNECTIONS
+             GRAPH CONNECTIONS
 
-             Nearby stars automatically form relationships.
+             Keep this selective.
 
-             Larger distance = more connections.
+             Connections should appear and disappear as the
+             constellation changes rather than everything
+             remaining permanently connected.
              -------------------------------------------------- */
 
           line_linked: {
@@ -207,36 +237,33 @@
 
             color: '#9b7a3c',
 
-            opacity: 0.20,
+            opacity: 0.30,
 
-            width: 0.75
+            width: 0.85
 
           },
 
 
           /* --------------------------------------------------
-             FIELD MOTION
+             ANONYMOUS NODE MOTION
 
-             Anonymous stars remain lively.
+             Only anonymous nodes actually use particles.js
+             velocity.
 
-             Named stars are calmed separately below.
+             Named particles are repositioned directly below.
              -------------------------------------------------- */
 
           move: {
 
             enable: true,
 
-            speed: 1.35,
+            speed: 1.15,
 
             direction: 'none',
 
             random: true,
 
             straight: false,
-
-            /*
-               Keep the same population within the chart.
-            */
 
             out_mode: 'bounce',
 
@@ -253,12 +280,6 @@
 
         },
 
-
-        /* ----------------------------------------------------
-           INTERACTIVITY
-
-           Disabled because this is part of the masthead.
-           ---------------------------------------------------- */
 
         interactivity: {
 
@@ -292,131 +313,237 @@
 
 
   /* ==========================================================
-     NAMED STAR COMPOSITION
+     NAMED STAR CONFIGURATION
 
-     These are home positions, not rigid coordinates.
+     ALL GEOMETRY IS NORMALIZED.
 
-     The stars may drift, but continuously gravitate toward
-     these locations.
+     x / y:
+       home position
 
-     The geometry is intentionally spread across the chart
-     rather than forcing a literal river shape.
+     radiusX / radiusY:
+       desired orbit dimensions
+
+       These can be intentionally large.
+
+       The system calculates a safe scale automatically if
+       the requested orbit would leave the chart.
+
+     rotation:
+       radians
+
+       0      = horizontal
+       0.785  = about 45 degrees
+       -0.785 = about -45 degrees
+
+     speed:
+       positive = one direction
+       negative = opposite direction
+
+     path:
+       ellipse
+       flow
+       wave
+       loop
+
+     deformation:
+       how strongly the orbit departs from a perfect ellipse
      ========================================================== */
 
   const namedStarConfig = {
 
-    cursa: {
-      x: 229,
-      y: 15,
+    achernar: {
 
-      r: 2.10,
+      x: 0.10,
+      y: 0.23,
 
-      homeStrength: 0.00135,
-      damping: 0.993,
-      maxSpeed: 0.38
+      r: 2.35,
+
+      path: 'ellipse',
+
+      radiusX: 0.16,
+      radiusY: 0.070,
+
+      rotation: 0.20,
+
+      speed: 0.00190,
+
+      deformation: 0.12
+
     },
 
 
-    beid: {
-      x: 182,
-      y: 34,
+    acamar: {
 
-      r: 1.45,
+      x: 0.20,
+      y: 0.38,
 
-      homeStrength: 0.00115,
-      damping: 0.994,
-      maxSpeed: 0.40
-    },
+      r: 1.80,
 
+      path: 'flow',
 
-    keid: {
-      x: 225,
-      y: 59,
+      radiusX: 0.19,
+      radiusY: 0.085,
 
-      r: 1.55,
+      rotation: -0.12,
 
-      homeStrength: 0.00125,
-      damping: 0.993,
-      maxSpeed: 0.38
-    },
+      speed: -0.00220,
 
+      deformation: 0.18
 
-    rana: {
-      x: 170,
-      y: 65,
-
-      r: 1.85,
-
-      homeStrength: 0.00105,
-      damping: 0.994,
-      maxSpeed: 0.40
     },
 
 
     /* --------------------------------------------------------
        AZHA
 
-       Slightly off-centre so it feels like a node inside the
-       graph rather than an isolated emblem.
+       Still calmer than the rest, but its orbit is now large
+       enough to visibly alter nearby connections.
        -------------------------------------------------------- */
 
     azha: {
-      x: 136,
-      y: 82,
+
+      x: 0.30,
+      y: 0.69,
 
       r: 3.00,
 
-      homeStrength: 0.0020,
-      damping: 0.989,
-      maxSpeed: 0.16
+      path: 'ellipse',
+
+      radiusX: 0.125,
+      radiusY: 0.052,
+
+      rotation: -0.22,
+
+      speed: 0.00145,
+
+      deformation: 0.10
+
+    },
+
+
+    rana: {
+
+      x: 0.47,
+      y: 0.43,
+
+      r: 1.85,
+
+      path: 'flow',
+
+      radiusX: 0.22,
+      radiusY: 0.095,
+
+      rotation: 0.27,
+
+      speed: -0.00250,
+
+      deformation: 0.21
+
+    },
+
+
+    beid: {
+
+      x: 0.59,
+      y: 0.62,
+
+      r: 1.45,
+
+      path: 'ellipse',
+
+      radiusX: 0.18,
+      radiusY: 0.085,
+
+      rotation: -0.35,
+
+      speed: 0.00210,
+
+      deformation: 0.14
+
     },
 
 
     zaurak: {
-      x: 187,
-      y: 96,
+
+      x: 0.71,
+      y: 0.50,
 
       r: 1.85,
 
-      homeStrength: 0.00105,
-      damping: 0.994,
-      maxSpeed: 0.40
+      path: 'wave',
+
+      radiusX: 0.20,
+      radiusY: 0.090,
+
+      rotation: 0.18,
+
+      speed: -0.00230,
+
+      deformation: 0.19
+
     },
 
 
     angetenar: {
-      x: 169,
-      y: 127,
+
+      x: 0.66,
+      y: 0.76,
 
       r: 1.45,
 
-      homeStrength: 0.00120,
-      damping: 0.994,
-      maxSpeed: 0.38
+      path: 'loop',
+
+      radiusX: 0.17,
+      radiusY: 0.075,
+
+      rotation: -0.28,
+
+      speed: 0.00260,
+
+      deformation: 0.17
+
     },
 
 
-    acamar: {
-      x: 102,
-      y: 139,
+    keid: {
 
-      r: 1.80,
+      x: 0.81,
+      y: 0.69,
 
-      homeStrength: 0.00120,
-      damping: 0.994,
-      maxSpeed: 0.38
+      r: 1.55,
+
+      path: 'flow',
+
+      radiusX: 0.17,
+      radiusY: 0.080,
+
+      rotation: 0.34,
+
+      speed: -0.00235,
+
+      deformation: 0.16
+
     },
 
 
-    achernar: {
-      x: 42,
-      y: 149,
+    cursa: {
 
-      r: 2.35,
+      x: 0.88,
+      y: 0.42,
 
-      homeStrength: 0.00140,
-      damping: 0.993,
-      maxSpeed: 0.34
+      r: 2.10,
+
+      path: 'ellipse',
+
+      radiusX: 0.14,
+      radiusY: 0.065,
+
+      rotation: -0.26,
+
+      speed: 0.00185,
+
+      deformation: 0.11
+
     }
 
   };
@@ -424,11 +551,16 @@
 
   /* ==========================================================
      LABEL CONFIGURATION
+
+     Labels remain in SVG coordinates because the SVG uses:
+
+       viewBox="0 0 260 110"
      ========================================================== */
 
   const labels = [
 
     {
+
       star: 'cursa',
 
       text: 'Cursa',
@@ -446,10 +578,12 @@
       arabicSize: 7.1,
 
       opacity: 0.58
+
     },
 
 
     {
+
       star: 'beid',
 
       text: 'Beid',
@@ -467,10 +601,12 @@
       arabicSize: 6.1,
 
       opacity: 0.45
+
     },
 
 
     {
+
       star: 'keid',
 
       text: 'Keid',
@@ -488,10 +624,12 @@
       arabicSize: 6.1,
 
       opacity: 0.45
+
     },
 
 
     {
+
       star: 'rana',
 
       text: 'Rana',
@@ -504,10 +642,12 @@
       size: 7.8,
 
       opacity: 0.50
+
     },
 
 
     {
+
       star: 'azha',
 
       text: 'Azha',
@@ -525,10 +665,12 @@
       arabicSize: 8.3,
 
       opacity: 0.96
+
     },
 
 
     {
+
       star: 'zaurak',
 
       text: 'Zaurak',
@@ -546,10 +688,12 @@
       arabicSize: 6.6,
 
       opacity: 0.54
+
     },
 
 
     {
+
       star: 'angetenar',
 
       text: 'Angetenar',
@@ -562,10 +706,12 @@
       size: 6.8,
 
       opacity: 0.41
+
     },
 
 
     {
+
       star: 'acamar',
 
       text: 'Acamar',
@@ -583,10 +729,12 @@
       arabicSize: 6.3,
 
       opacity: 0.49
+
     },
 
 
     {
+
       star: 'achernar',
 
       text: 'Achernar',
@@ -599,19 +747,423 @@
       size: 8.3,
 
       opacity: 0.55
+
     }
 
   ];
 
 
   /* ==========================================================
-     PARTICLE STATE PERSISTENCE
+     PATH FUNCTIONS
 
-     Jekyll navigation reloads the page.
+     These produce LOCAL coordinates.
 
-     Save the current constellation before leaving, then
-     restore it on the next page so the sky does not fully
-     regenerate every time the user follows a site link.
+     Their approximate ranges remain around:
+
+       x: -1 → +1
+       y: -1 → +1
+
+     Small smooth deformations make the movement feel less
+     mechanical without introducing noise or impulses.
+     ========================================================== */
+
+  function getOrbitPoint(
+    particle,
+    angle
+  ) {
+
+    const deformation =
+      particle.eridanusDeformation;
+
+
+    let x;
+    let y;
+
+
+    switch (
+      particle.eridanusPath
+    ) {
+
+
+      /* ------------------------------------------------------
+         FLOW
+
+         Long celestial-looking path with gentle asymmetry.
+         ------------------------------------------------------ */
+
+      case 'flow':
+
+        x =
+          Math.cos(
+            angle
+          )
+          +
+          deformation *
+          Math.sin(
+            angle * 2.0
+          );
+
+
+        y =
+          Math.sin(
+            angle
+          )
+          +
+          deformation *
+          0.55 *
+          Math.cos(
+            angle * 1.5
+          );
+
+        break;
+
+
+      /* ------------------------------------------------------
+         WAVE
+
+         More horizontally wandering.
+
+         Useful for changing graph topology.
+         ------------------------------------------------------ */
+
+      case 'wave':
+
+        x =
+          Math.cos(
+            angle
+          )
+          +
+          deformation *
+          Math.cos(
+            angle * 2.5
+          );
+
+
+        y =
+          Math.sin(
+            angle
+          )
+          +
+          deformation *
+          0.50 *
+          Math.sin(
+            angle * 2.0
+          );
+
+        break;
+
+
+      /* ------------------------------------------------------
+         LOOP
+
+         Slightly more complex but still continuous and calm.
+         ------------------------------------------------------ */
+
+      case 'loop':
+
+        x =
+          Math.cos(
+            angle
+          )
+          +
+          deformation *
+          0.75 *
+          Math.sin(
+            angle * 2.0
+          );
+
+
+        y =
+          Math.sin(
+            angle
+          )
+          +
+          deformation *
+          0.65 *
+          Math.cos(
+            angle * 3.0
+          );
+
+        break;
+
+
+      /* ------------------------------------------------------
+         ELLIPSE
+
+         Not perfectly mathematical: gets a very small
+         harmonic deformation.
+         ------------------------------------------------------ */
+
+      case 'ellipse':
+
+      default:
+
+        x =
+          Math.cos(
+            angle
+          )
+          +
+          deformation *
+          0.35 *
+          Math.sin(
+            angle * 2.0
+          );
+
+
+        y =
+          Math.sin(
+            angle
+          )
+          +
+          deformation *
+          0.30 *
+          Math.cos(
+            angle * 2.0
+          );
+
+        break;
+
+    }
+
+
+    return {
+      x: x,
+      y: y
+    };
+
+  }
+
+
+  /* ==========================================================
+     CALCULATE SAFE ORBIT SCALE
+
+     Rather than clamp animated positions at the edges, sample
+     the complete requested orbit and find its maximum extent.
+
+     We then scale the whole orbit uniformly so every point
+     remains within the chart.
+
+     This preserves the shape and smoothness of the path.
+     ========================================================== */
+
+  function calculateSafeOrbitScale(
+    particle
+  ) {
+
+    const samples =
+      720;
+
+
+    let minOffsetX =
+      Infinity;
+
+    let maxOffsetX =
+      -Infinity;
+
+    let minOffsetY =
+      Infinity;
+
+    let maxOffsetY =
+      -Infinity;
+
+
+    const cosRotation =
+      Math.cos(
+        particle.eridanusRotation
+      );
+
+
+    const sinRotation =
+      Math.sin(
+        particle.eridanusRotation
+      );
+
+
+    for (
+      let i = 0;
+      i < samples;
+      i += 1
+    ) {
+
+      const angle =
+        (
+          i /
+          samples
+        ) *
+        Math.PI *
+        2;
+
+
+      const point =
+        getOrbitPoint(
+          particle,
+          angle
+        );
+
+
+      const localX =
+        point.x *
+        particle.eridanusRequestedRadiusX;
+
+
+      const localY =
+        point.y *
+        particle.eridanusRequestedRadiusY;
+
+
+      const rotatedX =
+        localX *
+        cosRotation
+        -
+        localY *
+        sinRotation;
+
+
+      const rotatedY =
+        localX *
+        sinRotation
+        +
+        localY *
+        cosRotation;
+
+
+      minOffsetX =
+        Math.min(
+          minOffsetX,
+          rotatedX
+        );
+
+
+      maxOffsetX =
+        Math.max(
+          maxOffsetX,
+          rotatedX
+        );
+
+
+      minOffsetY =
+        Math.min(
+          minOffsetY,
+          rotatedY
+        );
+
+
+      maxOffsetY =
+        Math.max(
+          maxOffsetY,
+          rotatedY
+        );
+
+    }
+
+
+    /* --------------------------------------------------------
+       AVAILABLE SPACE AROUND THIS STAR'S HOME
+       -------------------------------------------------------- */
+
+    const availableLeft =
+      particle.eridanusHomeX -
+      SAFE_LEFT;
+
+
+    const availableRight =
+      SAFE_RIGHT -
+      particle.eridanusHomeX;
+
+
+    const availableTop =
+      particle.eridanusHomeY -
+      SAFE_TOP;
+
+
+    const availableBottom =
+      SAFE_BOTTOM -
+      particle.eridanusHomeY;
+
+
+    let scale =
+      1;
+
+
+    if (
+      minOffsetX < 0
+    ) {
+
+      scale =
+        Math.min(
+          scale,
+          availableLeft /
+          Math.abs(
+            minOffsetX
+          )
+        );
+
+    }
+
+
+    if (
+      maxOffsetX > 0
+    ) {
+
+      scale =
+        Math.min(
+          scale,
+          availableRight /
+          maxOffsetX
+        );
+
+    }
+
+
+    if (
+      minOffsetY < 0
+    ) {
+
+      scale =
+        Math.min(
+          scale,
+          availableTop /
+          Math.abs(
+            minOffsetY
+          )
+        );
+
+    }
+
+
+    if (
+      maxOffsetY > 0
+    ) {
+
+      scale =
+        Math.min(
+          scale,
+          availableBottom /
+          maxOffsetY
+        );
+
+    }
+
+
+    /*
+       Never enlarge beyond the requested orbit.
+
+       We only reduce it if necessary.
+    */
+
+    return Math.min(
+      1,
+      Math.max(
+        0,
+        scale
+      )
+    );
+
+  }
+
+
+  /* ==========================================================
+     PERSISTENCE
      ========================================================== */
 
   function saveParticleState(
@@ -625,13 +1177,6 @@
           function (particle) {
 
             return {
-
-              /*
-                 Save NORMALISED coordinates.
-
-                 This makes the saved state tolerant of
-                 different chart sizes after navigation.
-              */
 
               x:
                 particle.x /
@@ -649,7 +1194,10 @@
 
               radius:
                 particle.radius /
-                instance.canvas.w
+                instance.canvas.w,
+
+              orbitPhase:
+                particle.eridanusOrbitPhase
 
             };
 
@@ -665,10 +1213,7 @@
     } catch (error) {
 
       /*
-         sessionStorage may be unavailable in unusual browser
-         contexts.
-
-         The animation can still work perfectly without it.
+         Persistence is optional.
       */
 
     }
@@ -708,7 +1253,9 @@
     try {
 
       state =
-        JSON.parse(saved);
+        JSON.parse(
+          saved
+        );
 
     } catch (error) {
 
@@ -718,7 +1265,9 @@
 
 
     if (
-      !Array.isArray(state)
+      !Array.isArray(
+        state
+      )
     ) {
       return false;
     }
@@ -749,17 +1298,53 @@
           instance.canvas.h;
 
 
-        particle.vx =
-          old.vx;
+        if (
+          Number.isFinite(
+            old.vx
+          )
+        ) {
+
+          particle.vx =
+            old.vx;
+
+        }
 
 
-        particle.vy =
-          old.vy;
+        if (
+          Number.isFinite(
+            old.vy
+          )
+        ) {
+
+          particle.vy =
+            old.vy;
+
+        }
 
 
-        particle.radius =
-          old.radius *
-          instance.canvas.w;
+        if (
+          Number.isFinite(
+            old.radius
+          )
+        ) {
+
+          particle.radius =
+            old.radius *
+            instance.canvas.w;
+
+        }
+
+
+        if (
+          Number.isFinite(
+            old.orbitPhase
+          )
+        ) {
+
+          particle.eridanusOrbitPhase =
+            old.orbitPhase;
+
+        }
 
       }
     );
@@ -821,7 +1406,7 @@
 
 
   /* ==========================================================
-     SET UP NAMED PARTICLES
+     NAMED PARTICLE SETUP
      ========================================================== */
 
   function setupNamedParticles(
@@ -831,16 +1416,6 @@
     const particles =
       instance.particles.array;
 
-
-    /*
-       These are genuine particles.js particles.
-
-       Therefore they naturally:
-         - move
-         - form connections
-         - lose connections
-         - interact with anonymous field stars
-    */
 
     const namedParticles = {
 
@@ -874,125 +1449,150 @@
     };
 
 
-    /* --------------------------------------------------------
-       RESTORE PREVIOUS SKY IF AVAILABLE
-       -------------------------------------------------------- */
-
     const restored =
       restoreParticleState(
         instance
       );
 
 
-    /* --------------------------------------------------------
-       CONFIGURE NAMED PARTICLES
-       -------------------------------------------------------- */
+    const namedCount =
+      Object.keys(
+        namedParticles
+      ).length;
+
 
     Object.entries(
       namedParticles
     )
       .forEach(
         function (
-          [name, particle]
+          [name, particle],
+          index
         ) {
 
           const config =
             namedStarConfig[name];
 
 
-          /*
-             Only force the authored starting position on the
-             first page load.
-
-             During internal navigation, keep the restored sky.
-          */
-
-          if (!restored) {
-
-            placeParticle(
-              instance,
-              particle,
-              config.x,
-              config.y,
-              config.r
-            );
-
-          }
-
-
-          const canvas =
-            instance.canvas;
-
-
-          /*
-             Regardless of current position, the permanent
-             gravitational home remains authored.
-          */
+          /* --------------------------------------------------
+             HOME
+             -------------------------------------------------- */
 
           particle.eridanusHomeX =
-            (
-              config.x /
-              260
-            ) *
-            canvas.w;
+            config.x;
 
 
           particle.eridanusHomeY =
-            (
-              config.y /
-              160
-            ) *
-            canvas.h;
+            config.y;
 
 
-          particle.eridanusHomeStrength =
-            config.homeStrength;
+          /* --------------------------------------------------
+             PATH CHARACTER
+             -------------------------------------------------- */
+
+          particle.eridanusPath =
+            config.path;
 
 
-          particle.eridanusDamping =
-            config.damping;
+          particle.eridanusRequestedRadiusX =
+            config.radiusX;
 
 
-          particle.eridanusMaxSpeed =
-            config.maxSpeed;
+          particle.eridanusRequestedRadiusY =
+            config.radiusY;
 
 
-          /*
-             On initial load, calm the random velocity that
-             particles.js gave this particle.
+          particle.eridanusRotation =
+            config.rotation;
 
-             On a restored page, preserve existing velocity.
-          */
+
+          particle.eridanusOrbitSpeed =
+            config.speed;
+
+
+          particle.eridanusDeformation =
+            config.deformation;
+
+
+          /* --------------------------------------------------
+             PHASE
+
+             Different initial phases stop the constellation
+             looking synchronized.
+             -------------------------------------------------- */
+
+          if (
+            !Number.isFinite(
+              particle.eridanusOrbitPhase
+            )
+          ) {
+
+            particle.eridanusOrbitPhase =
+              (
+                index /
+                namedCount
+              ) *
+              Math.PI *
+              2;
+
+          }
+
+
+          /* --------------------------------------------------
+             SAFE ORBIT
+
+             Calculate once because the geometry is normalized
+             and therefore survives responsive resizing.
+             -------------------------------------------------- */
+
+          particle.eridanusOrbitScale =
+            calculateSafeOrbitScale(
+              particle
+            );
+
+
+          /* --------------------------------------------------
+             INITIAL STAR SIZE
+             -------------------------------------------------- */
+
+          particle.eridanusRadius =
+            config.r;
+
 
           if (!restored) {
 
-            particle.vx *=
-              0.36;
+            particle.x =
+              config.x *
+              instance.canvas.w;
 
 
-            particle.vy *=
-              0.36;
+            particle.y =
+              config.y *
+              instance.canvas.h;
 
           }
+
+
+          /*
+             Named particles do not use particles.js velocity.
+          */
+
+          particle.vx =
+            0;
+
+
+          particle.vy =
+            0;
 
         }
       );
 
 
-    /* --------------------------------------------------------
-       AZHA
+    /* ========================================================
+       AZHA COLOUR
+       ======================================================== */
 
-       Warm orange focal star.
-
-       Because it is still a real particle, its line
-       connections remain fully native to particles.js.
-       -------------------------------------------------------- */
-
-    const azha =
-      namedParticles.azha;
-
-
-    azha.color = {
+    namedParticles.azha.color = {
 
       rgb: {
         r: 217,
@@ -1003,9 +1603,9 @@
     };
 
 
-    /* --------------------------------------------------------
-       SAVE SKY WHEN LEAVING
-       -------------------------------------------------------- */
+    /* ========================================================
+       SAVE STATE
+       ======================================================== */
 
     window.addEventListener(
       'pagehide',
@@ -1031,64 +1631,23 @@
 
 
   /* ==========================================================
-     PLACE PARTICLE FROM SVG COORDINATES
-     ========================================================== */
+     SMOOTH INDEPENDENT NAMED-STAR MOTION
 
-  function placeParticle(
-    instance,
-    particle,
-    svgX,
-    svgY,
-    radius
-  ) {
+     This is deliberately NOT physics.
 
-    const canvas =
-      instance.canvas;
+     Every star simply evaluates its own continuous path.
 
-
-    particle.x =
-      (
-        svgX /
-        260
-      ) *
-      canvas.w;
-
-
-    particle.y =
-      (
-        svgY /
-        160
-      ) *
-      canvas.h;
-
-
-    const scale =
-      canvas.w /
-      260;
-
-
-    particle.radius =
-      radius *
-      scale;
-
-  }
-
-
-  /* ==========================================================
-     GENTLE GRAVITATIONAL HOME
-
-     There is NO orbit boundary.
-
-     Every frame:
-       - tiny attraction toward home
-       - gentle damping
-       - speed cap
-
-     Because the force is always active, there is no point
-     where a "rubber band" suddenly engages.
+     Therefore:
+       - no overshoot
+       - no spring effect
+       - no gravity
+       - no pendulum
+       - no inter-star influence
+       - no boundary bounce
      ========================================================== */
 
   function guideNamedParticles(
+    instance,
     namedParticles
   ) {
 
@@ -1098,78 +1657,142 @@
       .forEach(
         function (particle) {
 
-          const dx =
-            particle.eridanusHomeX -
-            particle.x;
+
+          /* --------------------------------------------------
+             ADVANCE INDIVIDUAL ORBIT
+             -------------------------------------------------- */
+
+          particle.eridanusOrbitPhase +=
+            particle.eridanusOrbitSpeed;
 
 
-          const dy =
-            particle.eridanusHomeY -
-            particle.y;
+          const angle =
+            particle.eridanusOrbitPhase;
 
 
           /* --------------------------------------------------
-             CONTINUOUS HOME GRAVITY
+             GET THIS STAR'S UNIQUE PATH
              -------------------------------------------------- */
 
-          particle.vx +=
-            dx *
-            particle.eridanusHomeStrength;
-
-
-          particle.vy +=
-            dy *
-            particle.eridanusHomeStrength;
-
-
-          /* --------------------------------------------------
-             DAMPING
-
-             Keeps named stars calm and prevents momentum from
-             accumulating.
-             -------------------------------------------------- */
-
-          particle.vx *=
-            particle.eridanusDamping;
-
-
-          particle.vy *=
-            particle.eridanusDamping;
-
-
-          /* --------------------------------------------------
-             SPEED CAP
-             -------------------------------------------------- */
-
-          const speed =
-            Math.hypot(
-              particle.vx,
-              particle.vy
+          const pathPoint =
+            getOrbitPoint(
+              particle,
+              angle
             );
 
 
-          const maxSpeed =
-            particle.eridanusMaxSpeed;
+          const scale =
+            particle.eridanusOrbitScale;
 
 
-          if (
-            speed >
-            maxSpeed
-          ) {
+          /* --------------------------------------------------
+             APPLY REQUESTED ORBIT DIMENSIONS
+             -------------------------------------------------- */
 
-            const scale =
-              maxSpeed /
-              speed;
-
-
-            particle.vx *=
-              scale;
+          const localX =
+            pathPoint.x *
+            particle.eridanusRequestedRadiusX *
+            scale;
 
 
-            particle.vy *=
-              scale;
+          const localY =
+            pathPoint.y *
+            particle.eridanusRequestedRadiusY *
+            scale;
 
-          }
+
+          /* --------------------------------------------------
+             ROTATE ORBIT
+
+             This prevents every path from lying horizontally.
+             -------------------------------------------------- */
+
+          const cosRotation =
+            Math.cos(
+              particle.eridanusRotation
+            );
+
+
+          const sinRotation =
+            Math.sin(
+              particle.eridanusRotation
+            );
+
+
+          const rotatedX =
+            localX *
+            cosRotation
+            -
+            localY *
+            sinRotation;
+
+
+          const rotatedY =
+            localX *
+            sinRotation
+            +
+            localY *
+            cosRotation;
+
+
+          /* --------------------------------------------------
+             FINAL NORMALIZED POSITION
+
+             No clamp is required.
+
+             calculateSafeOrbitScale() guarantees these remain
+             within our safe chart area.
+             -------------------------------------------------- */
+
+          const normalizedX =
+            particle.eridanusHomeX +
+            rotatedX;
+
+
+          const normalizedY =
+            particle.eridanusHomeY +
+            rotatedY;
+
+
+          /* --------------------------------------------------
+             CONVERT TO CURRENT CANVAS
+
+             This automatically adapts to responsive resizing.
+             -------------------------------------------------- */
+
+          particle.x =
+            normalizedX *
+            instance.canvas.w;
+
+
+          particle.y =
+            normalizedY *
+            instance.canvas.h;
+
+
+          /*
+             Prevent particles.js motion from fighting the
+             authored orbit.
+          */
+
+          particle.vx =
+            0;
+
+
+          particle.vy =
+            0;
+
+
+          /*
+             Responsive named-star radius.
+          */
+
+          particle.radius =
+            particle.eridanusRadius *
+            (
+              instance.canvas.w /
+              260
+            );
 
         }
       );
@@ -1178,7 +1801,7 @@
 
 
   /* ==========================================================
-     CANVAS → SVG COORDINATES
+     CANVAS → SVG
      ========================================================== */
 
   function canvasToSvg(
@@ -1195,12 +1818,13 @@
         ) *
         260,
 
+
       y:
         (
           particle.y /
           instance.canvas.h
         ) *
-        160
+        110
 
     };
 
@@ -1308,16 +1932,25 @@
     );
 
 
-    /* --------------------------------------------------------
-       FOLLOW NAMED PARTICLES
-       -------------------------------------------------------- */
+    /* ========================================================
+       ANIMATION LOOP
+       ======================================================== */
 
     function updateLabels() {
 
+      /* ------------------------------------------------------
+         MOVE NAMED STARS
+         ------------------------------------------------------ */
+
       guideNamedParticles(
+        instance,
         namedParticles
       );
 
+
+      /* ------------------------------------------------------
+         MOVE LABELS WITH THEIR STARS
+         ------------------------------------------------------ */
 
       Object.entries(
         labelElements
