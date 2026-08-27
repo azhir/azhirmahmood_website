@@ -3,16 +3,13 @@ layout: default
 title: About
 permalink: /about/
 ---
-
 <div class="about-page" markdown="1">
-
 <img
   class="about-image"
-  src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg"
+  src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
   alt="Azhir">
 
 # About
-
 I'm Azhir.
 
 I work on machine learning, medical imaging, and inverse problems. This site is where I write things down properly — notes, proofs, experiments, half-finished ideas, and occasionally something resembling working code.
