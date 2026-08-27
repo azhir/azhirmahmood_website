@@ -3,22 +3,29 @@ layout: default
 title: About
 permalink: /about/
 ---
-<div class="about-photo-placeholder">A</div>
+
+<div class="about-page" markdown="1">
+
+<img
+  class="about-image"
+  src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg"
+  alt="Azhir">
 
 # About
 
-I'm Azhir. This is where I write things down properly — notes, proofs,
-half-finished ideas, and the occasional working piece of code.
+I'm Azhir.
 
-Replace this paragraph with your real bio: what you work on, what you're
-curious about, and what people should expect to find here.
+I work on machine learning, medical imaging, and inverse problems. This site is where I write things down properly — notes, proofs, experiments, half-finished ideas, and occasionally something resembling working code.
 
-**Elsewhere:**
+A lot of what ends up here comes from questions I encounter while doing research: things I want to understand more carefully, derivations I don't want to lose, or ideas that are easier to think through once they're written down.
+
+You can expect a mixture of technical notes, research-adjacent writing, and whatever else I happen to be curious about.
+
+<!-- 
+**Elsewhere**
 
 - Email: [you@azhir.com](mailto:you@azhir.com)
-- GitHub: [github.com/yourhandle](https://github.com/)
-- Twitter/X: [@yourhandle](https://twitter.com/)
+- GitHub: [github.com/yourhandle](https://github.com/yourhandle)
+- Twitter/X: [@yourhandle](https://twitter.com/yourhandle) -->
 
-<small>Edit this file at <code>about.md</code> — swap in real links and drop
-a photo into <code>assets/img/</code> if you'd rather use one than the
-initial-in-a-circle placeholder.</small>
+</div>
