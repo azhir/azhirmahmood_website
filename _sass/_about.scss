@@ -36,6 +36,22 @@
 }
 
 
+/* IMAGE ABOVE / TEXT BELOW */
+.split-stack {
+  display: block;
+}
+
+.split-stack .media {
+  width: min(100%, 700px);
+  margin: 0 auto 2rem;
+}
+
+.split-stack .img {
+  width: 100%;
+  height: auto;
+}
+
+
 /* ==========================================================
    IMAGE FRAME
    ========================================================== */
@@ -57,10 +73,9 @@
    ========================================================== */
 
 /*
-   Add this only to the opening image.
+   Opening / primary image.
 
-   It gets the tall desktop treatment
-   and remains visible on mobile.
+   Gives it the tall desktop treatment.
 */
 
 .media-main {
@@ -80,9 +95,6 @@
 
   max-width: none;
 
-  /*
-     Fill the frame and crop as necessary.
-  */
   object-fit: cover;
 
   /*
@@ -100,10 +112,6 @@
 
   /*
      Optional extra zoom / crop.
-
-     1    = none
-     1.05 = slight
-     1.10 = moderate
   */
   transform: scale(1);
 
@@ -114,11 +122,6 @@
 /* ==========================================================
    MAIN IMAGE-SPECIFIC CONTROL
    ========================================================== */
-
-/*
-   Keep this if you want your opening image
-   to have its own framing.
-*/
 
 .img-main {
   min-height: 850px;
@@ -134,11 +137,9 @@
   min-width: 0;
 }
 
-
 .copy > :first-child {
   margin-top: 0;
 }
-
 
 .copy p {
   line-height: 1.65;
@@ -148,16 +149,6 @@
 /* ==========================================================
    SEPARATE SECTION
    ========================================================== */
-
-/*
-   Use this for a clearly separated new section.
-
-   It can contain:
-     - text only
-     - another .split
-     - lists
-     - headings
-*/
 
 .section {
   width: 100%;
@@ -175,9 +166,9 @@
 
 @media (max-width: 900px) {
 
-  /* -----------------------------------------------
-     Everything becomes single-column
-     ----------------------------------------------- */
+  /* --------------------------------------------------------
+     Split layouts become single-column
+     -------------------------------------------------------- */
 
   .split,
   .split-left,
@@ -187,28 +178,16 @@
   }
 
 
-  /* -----------------------------------------------
-     Hide all secondary images
-     ----------------------------------------------- */
-
-  .media {
-    display: none;
-  }
-
-
-  /* -----------------------------------------------
-     Keep the opening/main image
-     ----------------------------------------------- */
+  /* --------------------------------------------------------
+     MAIN IMAGE
+     -------------------------------------------------------- */
 
   .media-main {
-    display: block;
-
     width: 100%;
     min-height: 0;
 
     margin-bottom: 1.5rem;
   }
-
 
   .media-main .img {
     width: 100%;
@@ -227,18 +206,48 @@
   }
 
 
-  /* -----------------------------------------------
-     Text
-     ----------------------------------------------- */
+  /* --------------------------------------------------------
+     OPTIONAL MOBILE IMAGE HIDING
+
+     Add class="media media-hide-mobile"
+     to secondary/decorative images you don't want on mobile.
+     -------------------------------------------------------- */
+
+  .media-hide-mobile {
+    display: none;
+  }
+
+
+  /* --------------------------------------------------------
+     NORMAL SECONDARY IMAGES
+
+     If not explicitly hidden, they become ordinary
+     full-width images on mobile.
+     -------------------------------------------------------- */
+
+  .split .media:not(.media-main):not(.media-hide-mobile) {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .split .media:not(.media-main):not(.media-hide-mobile) .img {
+    width: 100%;
+    height: auto;
+  }
+
+
+  /* --------------------------------------------------------
+     TEXT
+     -------------------------------------------------------- */
 
   .copy {
     width: 100%;
   }
 
 
-  /* -----------------------------------------------
-     Separate sections
-     ----------------------------------------------- */
+  /* --------------------------------------------------------
+     SEPARATE SECTIONS
+     -------------------------------------------------------- */
 
   .section {
     margin-top: 3rem;

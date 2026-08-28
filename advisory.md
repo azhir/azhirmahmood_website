@@ -61,7 +61,7 @@ Building research and technical functions that can move from early experimentati
 
   </div>
 
-  <div class="media">
+  <div class="media media-hide-mobile">
     <img
       class="img"
       src="https://images.pdimagearchive.org/collections/hi-res-images-from-the-apollo-missions/21963930856_66e9be4b16_o.jpg"
