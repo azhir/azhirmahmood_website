@@ -1,0 +1,235 @@
+/* ==========================================================
+   ERIDANUS — LIVING CONSTELLATION
+   ========================================================== */
+
+.chart-wrap {
+  position: relative;
+  isolation: isolate;
+
+  flex: 0 1 clamp(260px, 32vw, 450px);
+  width: clamp(260px, 32vw, 450px);
+  max-width: 450px;
+
+  aspect-ratio: 260 / 110;
+
+  margin-left: auto;
+
+  overflow: visible;
+
+  /*
+     Give labels permission to paint outside
+     the chart's own layout box.
+  */
+  contain: layout;
+}
+
+.chart-svg {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  overflow: visible;
+
+  pointer-events: none;
+
+  color: var(--brass);
+}
+
+
+/* ==========================================================
+   GRAPH EDGES
+   ========================================================== */
+
+.chart-edge {
+  fill: none;
+
+  stroke: var(--brass);
+
+  stroke-width: 0.72;
+
+  stroke-linecap: round;
+
+  /*
+     Keeps line thickness visually consistent as the SVG
+     responds to different screen sizes.
+  */
+  vector-effect: non-scaling-stroke;
+}
+
+
+/* ==========================================================
+   NAMED STARS
+   ========================================================== */
+
+.chart-star {
+  fill: var(--brass);
+
+  opacity: 0.76;
+}
+
+
+/*
+   Azha is deterministic.
+
+   It no longer inherits random particle.js colour, opacity,
+   or radius values.
+*/
+.chart-star--azha {
+  fill: #d9962f;
+
+  opacity: 0.98;
+}
+
+
+/*
+   Extremely subtle visual anchor around Azha.
+*/
+.chart-star-halo {
+  fill: #d9962f;
+
+  opacity: 0.07;
+}
+
+
+/* ==========================================================
+   UNNAMED / BRIDGE STARS
+   ========================================================== */
+
+.chart-bridge-star {
+  fill: var(--brass);
+}
+
+
+/* ==========================================================
+   LABEL GROUPS
+   ========================================================== */
+
+/*
+   Colour and opacity belong to the bilingual GROUP.
+
+   Therefore:
+
+      Azha · ازها
+
+   always behaves as one visual object.
+*/
+.chart-label-group {
+  color: var(--brass);
+
+  pointer-events: none;
+}
+
+
+/*
+   Azha's entire bilingual label uses one colour.
+*/
+.chart-label-azha {
+  color: #b7771f;
+}
+
+
+/* ==========================================================
+   LABEL TYPOGRAPHY
+   ========================================================== */
+
+.chart-label {
+  fill: currentColor;
+
+  /*
+     Cartographic paper halo so graph edges cannot visually
+     slice through the lettering.
+  */
+  stroke: var(--paper);
+
+  paint-order: stroke fill;
+
+  stroke-width: 1.5px;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  font-family:
+    "Fraunces",
+    Georgia,
+    serif;
+
+  font-style: italic;
+
+  font-weight: 400;
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+
+/*
+   Separator belongs to the bilingual unit but should not
+   inherit the English italic.
+*/
+.chart-label-separator {
+  font-style: normal;
+}
+
+
+/* ==========================================================
+   ARABIC
+
+   Arabic differs typographically, NOT chromatically.
+
+   It inherits:
+      fill: currentColor
+
+   from .chart-label, so it always matches the English.
+   ========================================================== */
+
+.chart-label-arabic {
+  font-family:
+    "Noto Naskh Arabic",
+    "Noto Serif Arabic",
+    "Geeza Pro",
+    "Traditional Arabic",
+    serif;
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  stroke-width: 1.35px;
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .chart-star-halo {
+    opacity: 0.055;
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+
+   Keep your current behaviour initially.
+
+   Once the desktop version is visually settled, I would
+   revisit this and consider showing a simplified Azha-only
+   signature on mobile.
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+  .chart-wrap {
+    display: none;
+  }
+
+}
