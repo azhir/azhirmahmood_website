@@ -4,12 +4,19 @@ title: Advisory
 permalink: /advisory/
 ---
 
-<div class="about-page" markdown="1">
-<img
-  class="main-image"
-  src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
-  alt="Azhir">
+<div class="about-page">
 
+<div class="advisory-split">
+
+  <div class="image-frame main-image-frame">
+    <img
+      class="advisory-image main-image"
+      src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
+      alt="Illustration"
+    >
+  </div>
+
+  <div class="advisory-copy" markdown="1">
 
 # Advisory
 
@@ -23,35 +30,16 @@ Today, I work with founders on the decisions that are hardest to make from insid
 
 I am most useful when the problem sits across technology, capital and company strategy — where the consequences of getting the decision wrong are measured in months, millions, or both.
 
-<!-- <br/><br/> 
-<br/><br/> 
+  </div>
 
----
-
-### Where I work
-**Company strategy**
-Choosing the market, product and technical bets that determine the next stage of the company.
-
-**Fundraising & investor strategy**
-Round sizing, narrative, investor positioning, targeting and preparation for consequential raises.
-
-**Research → product**
-Turning differentiated technical capability into a product, roadmap and commercial proposition.
-
-**Technical organisation**
-Building research and technical functions that can move from early experimentation to a scalable company.
-
-**Founder decision support**
-Independent judgement on high-stakes decisions where the founder needs someone who understands both the technology and the company around it.
-
-</div> -->
+</div>
 
 
-<section class="advisory-section" markdown="1">
-<img
-  class="right-image"
-  src="https://images.pdimagearchive.org/collections/hi-res-images-from-the-apollo-missions/21963930856_66e9be4b16_o.jpg"
-  alt="Azhir">
+<section class="advisory-section">
+
+<div class="advisory-split advisory-split--right">
+
+  <div class="advisory-copy" markdown="1">
 
 ## Where I work
 
@@ -67,4 +55,18 @@ Turning differentiated technical capability into a product, roadmap and commerci
 **Technical organisation**  
 Building research and technical functions that can move from early experimentation to a scalable company.
 
+  </div>
+
+  <div class="image-frame">
+    <img
+      class="advisory-image"
+      src="https://images.pdimagearchive.org/collections/hi-res-images-from-the-apollo-missions/21963930856_66e9be4b16_o.jpg"
+      alt="Apollo mission photograph"
+    >
+  </div>
+
+</div>
+
 </section>
+
+</div>
