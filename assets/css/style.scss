@@ -224,6 +224,12 @@ body {
   padding: 2rem 0 6rem;
 }
 
+.content-wrap.content-wrap--wide {
+  max-width: var(--header-w);
+  /* top | horizontal | bottom */
+  padding: 0 0 6rem;
+}
+
 /* ==========================================================
    STANDARD PAGE CONTENT
    ========================================================== */

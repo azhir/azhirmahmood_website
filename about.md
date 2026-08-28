@@ -1,11 +1,11 @@
 ---
-layout: default
+layout: profile
 title: About
 permalink: /about/
 ---
 <div class="about-page" markdown="1">
 <img
-  class="about-image"
+  class="main-image"
   src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
   alt="Azhir">
 

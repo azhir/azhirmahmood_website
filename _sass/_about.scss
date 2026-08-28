@@ -1,6 +1,10 @@
+/* ==========================================================
+   ABOUT / ADVISORY PAGE
+   ========================================================== */
+
 .about-page {
-  max-width: 1100px;
-  margin: 0rem auto;
+  width: 100%;
+  margin: 0;
 
   &::after {
     content: "";
@@ -9,18 +13,97 @@
   }
 }
 
-.about-image {
+
+/* ==========================================================
+   MAIN IMAGE
+   ========================================================== */
+
+.main-image {
   float: left;
 
   width: 40%;
   max-width: 450px;
-  height: 800px;
+  height: 850px;
 
-  margin: 0 1.2rem 0rem 0;
+  /*
+    Whole image block position:
+    top | right | bottom | left
+  */
+  margin:
+    -30px   // top
+    2rem  // right
+    0       // bottom
+    0;      // left
 
+  /*
+    Keeps the side crop you liked.
+  */
   object-fit: cover;
-  object-position: center;
+
+  /*
+    Artwork position inside the image box:
+    horizontal vertical
+  */
+  object-position: 50% 65%;
+
+  /*
+    Extra crop:
+    top | right | bottom | left
+  */
+  clip-path: inset(
+    40px
+    0
+    40px
+    0
+  );
 }
+
+.right-image {
+  float: right;
+  width: 40%;
+  max-width: 450px;
+  height: 850px;
+
+  /*
+    Whole image block position:
+    top | right | bottom | left
+  */
+  margin:
+    -30px   // top
+    0  // right
+    0       // bottom
+    2rem;      // left
+
+  /*
+    Keeps the side crop you liked.
+  */
+  object-fit: cover;
+
+  /*
+    Artwork position inside the image box:
+    horizontal vertical
+  */
+  object-position: 50% 65%;
+
+  /*
+    Extra crop:
+    top | right | bottom | left
+  */
+  clip-path: inset(
+    40px
+    0
+    40px
+    0
+  );
+}
+
+
+
+
+
+/* ==========================================================
+   ABOUT TYPOGRAPHY
+   ========================================================== */
 
 .about-page h1 {
   margin-top: 0;
@@ -30,14 +113,44 @@
   line-height: 1.65;
 }
 
-@media (max-width: 800px) {
-  .about-image {
-    float: none;
 
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 650px) {
+
+  .main-image {
+    float: none;
     width: 100%;
     max-width: none;
     height: 400px;
-
     margin: 0 0 2rem 0;
+    object-position: 50% 50%;
+    clip-path: inset(
+      20px
+      0
+      20px
+      0
+    );
   }
+  .right-image {
+        display: none;
+
+  }
+}
+
+/* ==========================================================
+   ADVISORY — SEPARATE LOWER SECTION
+   ========================================================== */
+
+.advisory-section {
+  clear: both;
+
+  width: 100%;
+
+  margin-top: 5rem;
+  padding-top: 3rem;
+
+  border-top: 1px solid var(--paper-line);
 }
