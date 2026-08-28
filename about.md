@@ -4,19 +4,19 @@ title: About
 permalink: /about/
 ---
 
-<div class="about-page">
+<div class="page">
 
-<div class="advisory-split">
+<div class="split split-left">
 
-  <div class="image-frame main-image-frame">
+  <div class="media media-main">
     <img
-      class="advisory-image main-image"
+      class="img img-main"
       src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
       alt="Azhir"
     >
   </div>
 
-  <div class="advisory-copy" markdown="1">
+  <div class="copy" markdown="1">
 
 # About
 

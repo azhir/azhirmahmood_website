@@ -4,19 +4,23 @@ title: Advisory
 permalink: /advisory/
 ---
 
-<div class="about-page">
+<div class="page">
 
-<div class="advisory-split">
+<div class="split split-left">
 
-  <div class="image-frame main-image-frame">
+  <div class="media media-main">
     <img
-      class="advisory-image main-image"
+      class="img img-main"
       src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
       alt="Illustration"
+      style="
+        object-position: 42% 68%; 
+        transform: scale(1.08);
+        "
     >
   </div>
 
-  <div class="advisory-copy" markdown="1">
+  <div class="copy" markdown="1">
 
 # Advisory
 
@@ -35,11 +39,11 @@ I am most useful when the problem sits across technology, capital and company st
 </div>
 
 
-<section class="advisory-section">
+<section class="section">
 
-<div class="advisory-split advisory-split--right">
+<div class="split split-right">
 
-  <div class="advisory-copy" markdown="1">
+  <div class="copy" markdown="1">
 
 ## Where I work
 
@@ -57,9 +61,9 @@ Building research and technical functions that can move from early experimentati
 
   </div>
 
-  <div class="image-frame">
+  <div class="media">
     <img
-      class="advisory-image"
+      class="img"
       src="https://images.pdimagearchive.org/collections/hi-res-images-from-the-apollo-missions/21963930856_66e9be4b16_o.jpg"
       alt="Apollo mission photograph"
     >

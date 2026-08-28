@@ -1,8 +1,8 @@
 /* ==========================================================
-   ABOUT / ADVISORY PAGE
+   GENERIC PROFILE / CONTENT PAGE
    ========================================================== */
 
-.about-page {
+.page {
   width: 100%;
   margin: 0;
 }
@@ -12,26 +12,24 @@
    SPLIT SECTIONS
    ========================================================== */
 
-.advisory-split {
+.split {
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 450px)
-    minmax(0, 1fr);
-
-  gap: 2rem;
-
-  align-items: stretch;
-
   width: 100%;
+  gap: 2rem;
+  align-items: stretch;
 }
 
 
-/*
-   Use this modifier when the image should be on the RIGHT.
-*/
+/* IMAGE LEFT */
+.split-left {
+  grid-template-columns:
+    minmax(0, 450px)
+    minmax(0, 1fr);
+}
 
-.advisory-split--right {
+
+/* IMAGE RIGHT */
+.split-right {
   grid-template-columns:
     minmax(0, 1fr)
     minmax(0, 450px);
@@ -42,23 +40,39 @@
    IMAGE FRAME
    ========================================================== */
 
-.image-frame {
+.media {
   position: relative;
 
   width: 100%;
 
-  overflow: hidden;
-
   min-width: 0;
   min-height: 0;
+
+  overflow: hidden;
 }
 
 
 /* ==========================================================
-   SHARED IMAGE BEHAVIOUR
+   MAIN / START IMAGE
    ========================================================== */
 
-.advisory-image {
+/*
+   Add this only to the opening image.
+
+   It gets the tall desktop treatment
+   and remains visible on mobile.
+*/
+
+.media-main {
+  min-height: 850px;
+}
+
+
+/* ==========================================================
+   IMAGE
+   ========================================================== */
+
+.img {
   display: block;
 
   width: 100%;
@@ -67,7 +81,7 @@
   max-width: none;
 
   /*
-     Keeps the cropped-image behaviour.
+     Fill the frame and crop as necessary.
   */
   object-fit: cover;
 
@@ -76,23 +90,20 @@
 
      horizontal vertical
 
-     Examples:
-
      50% 50% = centre
-     40% 50% = show more left
-     60% 50% = show more right
-     50% 40% = show more top
-     50% 70% = show more bottom
+     40% 50% = more left
+     60% 50% = more right
+     50% 40% = more top
+     50% 70% = more bottom
   */
   object-position: 50% 65%;
 
   /*
-     EXTRA ZOOM / CROP
+     Optional extra zoom / crop.
 
-     1.00 = none
+     1    = none
      1.05 = slight
      1.10 = moderate
-     1.20 = stronger
   */
   transform: scale(1);
 
@@ -101,23 +112,16 @@
 
 
 /* ==========================================================
-   MAIN / HERO IMAGE
+   MAIN IMAGE-SPECIFIC CONTROL
    ========================================================== */
 
-.main-image-frame {
-  /*
-     Desktop hero height.
-  */
-  min-height: 850px;
-}
+/*
+   Keep this if you want your opening image
+   to have its own framing.
+*/
 
-.main-image {
+.img-main {
   min-height: 850px;
-
-  /*
-     Hero-specific framing.
-     Adjust this independently if needed.
-  */
   object-position: 50% 65%;
 }
 
@@ -126,24 +130,36 @@
    TEXT
    ========================================================== */
 
-.advisory-copy {
+.copy {
   min-width: 0;
 }
 
-.about-page h1 {
+
+.copy > :first-child {
   margin-top: 0;
 }
 
-.about-page p {
+
+.copy p {
   line-height: 1.65;
 }
 
 
 /* ==========================================================
-   SEPARATE LOWER SECTION
+   SEPARATE SECTION
    ========================================================== */
 
-.advisory-section {
+/*
+   Use this for a clearly separated new section.
+
+   It can contain:
+     - text only
+     - another .split
+     - lists
+     - headings
+*/
+
+.section {
   width: 100%;
 
   margin-top: 5rem;
@@ -157,27 +173,34 @@
    MOBILE
    ========================================================== */
 
-@media (max-width: 650px) {
+@media (max-width: 900px) {
 
-  /*
-     Everything becomes a normal single-column reading flow.
-  */
+  /* -----------------------------------------------
+     Everything becomes single-column
+     ----------------------------------------------- */
 
-  .advisory-split,
-  .advisory-split--right {
+  .split,
+  .split-left,
+  .split-right {
     display: block;
-
     width: 100%;
   }
 
 
-  /* --------------------------------------------------------
-     HERO IMAGE
+  /* -----------------------------------------------
+     Hide all secondary images
+     ----------------------------------------------- */
 
-     Keep the main image on mobile.
-     -------------------------------------------------------- */
+  .media {
+    display: none;
+  }
 
-  .main-image-frame {
+
+  /* -----------------------------------------------
+     Keep the opening/main image
+     ----------------------------------------------- */
+
+  .media-main {
     display: block;
 
     width: 100%;
@@ -186,7 +209,8 @@
     margin-bottom: 1.5rem;
   }
 
-  .main-image {
+
+  .media-main .img {
     width: 100%;
 
     height: 360px;
@@ -203,31 +227,20 @@
   }
 
 
-  /* --------------------------------------------------------
-     SECONDARY IMAGES
+  /* -----------------------------------------------
+     Text
+     ----------------------------------------------- */
 
-     Hide them on mobile so the reading flow stays clean.
-     -------------------------------------------------------- */
-
-  .image-frame:not(.main-image-frame) {
-    display: none;
-  }
-
-
-  /* --------------------------------------------------------
-     TEXT
-     -------------------------------------------------------- */
-
-  .advisory-copy {
+  .copy {
     width: 100%;
   }
 
 
-  /* --------------------------------------------------------
-     LOWER SECTIONS
-     -------------------------------------------------------- */
+  /* -----------------------------------------------
+     Separate sections
+     ----------------------------------------------- */
 
-  .advisory-section {
+  .section {
     margin-top: 3rem;
     padding-top: 2rem;
   }
