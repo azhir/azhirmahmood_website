@@ -1,0 +1,67 @@
+
+.hero-mark-math{
+  display:none;
+}
+
+.hero-mark-plain{
+  display:block;
+  position:relative;
+  margin:2rem 0 2.2rem;
+  padding:2px;
+  border:1px solid var(--brass);
+}
+
+.hero-mark-inner{
+  position:relative;
+  padding:1.6rem 1.3rem 1.5rem;
+  border:1px solid var(--brass);
+  background:radial-gradient(ellipse at 20% 15%, rgba(156,122,60,0.10), rgba(156,122,60,0.03) 60%);
+  text-align:center;
+  color:var(--brass);
+}
+
+.hero-corner{
+  position:absolute;
+  font-size:1.1rem;
+  line-height:1;
+  opacity:0.6;
+  color:var(--brass);
+}
+.hero-corner--tl{ top:8px; left:10px; transform:rotate(0deg); }
+.hero-corner--tr{ top:8px; right:10px; transform:rotate(90deg); }
+.hero-corner--br{ bottom:8px; right:10px; transform:rotate(180deg); }
+.hero-corner--bl{ bottom:8px; left:10px; transform:rotate(270deg); }
+
+.hero-sigil{
+  display:block;
+  width:58px;
+  height:58px;
+  margin:0 auto 0.8rem;
+}
+
+.hero-attribution{
+  margin:0 0 0.9rem;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:0.6rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--brass);
+  opacity:0.6;
+}
+
+.hero-couplet{
+  margin:0;
+  font-family:Georgia, serif;
+  font-size:1.05rem;
+  line-height:1.9;
+  color:var(--ink);
+}
+
+.hero-bio{
+  margin:1rem 0 0;
+  font-family:Georgia, serif;
+  font-style:italic;
+  font-size:1rem;
+  line-height:1.6;
+  color:var(--ink);
+}

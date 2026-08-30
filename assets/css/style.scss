@@ -3,7 +3,7 @@
 @import "about";
 @import "eridanus";
 @import "posts";
-
+@import "hero";
 
 /* ==========================================================
    AZHIR — SITE STYLESHEET
@@ -185,7 +185,7 @@ body {
   opacity: 0.35;
 }
 
-.hero-mark {
+.hero-mark-math {
   margin: 2rem 0 2.2rem;
   padding: 1.1rem 1.35rem;
   border-left: 2px solid var(--brass);

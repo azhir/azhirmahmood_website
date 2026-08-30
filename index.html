@@ -3,9 +3,44 @@ layout: default
 title: Home
 ---
 
-<div class="hero-mark">
+<div class="hero-mark-math">
   $$ \S \quad \text{welcome} := \left\{\, x \in \text{azhir.com} \;\middle|\; x \text{ is worth writing down properly} \,\right\} $$
 </div>
+
+<div class="hero-mark-plain">
+  <div class="hero-mark-inner">
+    <span class="hero-corner hero-corner--tl" aria-hidden="true">&#10086;</span>
+    <span class="hero-corner hero-corner--tr" aria-hidden="true">&#10086;</span>
+    <span class="hero-corner hero-corner--bl" aria-hidden="true">&#10086;</span>
+    <span class="hero-corner hero-corner--br" aria-hidden="true">&#10086;</span>
+
+    <svg class="hero-sigil" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+      <circle cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
+      <polygon points="50,22 74,64 26,64" fill="none" stroke="currentColor" stroke-width="1" opacity="0.85"/>
+      <polygon points="50,78 26,36 74,36" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
+      <circle cx="50" cy="50" r="3.2" fill="currentColor"/>
+      <circle cx="50" cy="8"  r="1.3" fill="currentColor" opacity="0.7"/>
+      <circle cx="50" cy="92" r="1.3" fill="currentColor" opacity="0.7"/>
+      <circle cx="8"  cy="50" r="1.3" fill="currentColor" opacity="0.7"/>
+      <circle cx="92" cy="50" r="1.3" fill="currentColor" opacity="0.7"/>
+    </svg>
+
+    <p class="hero-attribution">Ghalib</p>
+
+    <p class="hero-couplet" dir="rtl">
+      ہزاروں خواہشیں ایسی کہ ہر خواہش پہ دم نکلے<br/>
+      بہت نکلے مرے ارمان لیکن پھر بھی کم نکلے
+    </p>
+
+    <p class="hero-bio">
+      I&rsquo;m Azhir Mahmood. This site is an old craft applied to a new one — treating intelligence like alchemy: raw material, patient transformation, something worth writing down once it holds.
+    </p>
+  </div>
+</div>
+
+
+
 
 <ul class="post-list">
   {% assign posts = site.posts %}
@@ -32,11 +67,6 @@ title: Home
         <p class="post-card-meta">
           {{ post.date | date: "%b %Y" }}{% if post.tags.size > 0 %} · {{ post.tags | slice: 0, 2 | join: ", " }}{% endif %}{% if post.level %} · {{ post.level }}{% endif %}
         </p>
-    
-        
-        <!-- <p class="post-card-meta">
-          {{ post.date | date: "%b %Y" }}{% if post.tags.size > 0 %} · {{ post.tags | slice: 0, 2 | join: ", " }}{% endif %}
-        </p> -->
 
         <h2 class="post-card-title">{{ post.title }}</h2>
         <p class="post-card-excerpt">
