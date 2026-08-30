@@ -1,0 +1,51 @@
+/* ==========================================================
+   TOKENS — single source of truth for breakpoints & dimensions
+   Import this FIRST, before any partial that uses mq() or $split-*.
+   ========================================================== */
+
+@import url(
+  'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap'
+);
+
+:root {
+  --paper: #F5F0E3;
+  --paper-line: #DED5BE;
+  --ink: #1B1A17;
+  --ink-soft: #5C564B;
+  --brass: #9C7A3C;
+  --navy: #1F3350;
+  --header-w: 1100px;
+  --content-w: 920px;
+  --footer-w: 1100px;
+}
+
+/* --------------------------------------------------------
+   BREAKPOINTS
+   One name, one number, used everywhere via mq().
+   Add a tier here and every partial can use it immediately —
+   never hardcode a media query width anywhere else.
+   -------------------------------------------------------- */
+
+$breakpoints: (
+  sm: 651px,   // content-wrap gutters relax, chart appears
+  md: 901px,   // split layouts go two-column
+  lg: 1101px   // full desktop header spacing
+);
+
+@mixin mq($name) {
+  @if not map-has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Available: #{map-keys($breakpoints)}.";
+  }
+  @media (min-width: map-get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+/* --------------------------------------------------------
+   SPLIT-LAYOUT DIMENSIONS
+   Named so a future second column variant doesn't require
+   hunting down every literal "450px".
+   -------------------------------------------------------- */
+
+$split-col-width: 450px;
+$split-hero-height: 850px;

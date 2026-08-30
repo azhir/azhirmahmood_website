@@ -11,23 +11,13 @@
     {% include header.html %}
   </div>
 
-  <main class="content-wrap">
+  <main class="content-wrap{% if page.wide %} content-wrap--wide{% endif %}">
     {{ content }}
   </main>
 
   <div class="footer-wrap">
     {% include footer.html %}
   </div>
-
-
-  <!-- =====================================================
-       CONSTELLATION SCRIPTS
-       ===================================================== -->
-
-  <!-- <script
-    src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"
-    defer
-  ></script> -->
 
   <script
     src="{{ '/assets/js/eridanus-chart.js' | relative_url }}"

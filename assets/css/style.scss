@@ -1,5 +1,6 @@
 ---
 ---
+@import "tokens";
 @import "about";
 @import "eridanus";
 @import "posts";
@@ -7,23 +8,11 @@
 
 /* ==========================================================
    AZHIR — SITE STYLESHEET
+
+   Fonts, :root tokens, breakpoints ($breakpoints / mq()), and
+   split-layout dimensions all live in _tokens.scss now — this
+   file no longer redeclares them.
    ========================================================== */
-
-@import url(
-  'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap'
-);
-
-:root {
-  --paper: #F5F0E3;
-  --paper-line: #DED5BE;
-  --ink: #1B1A17;
-  --ink-soft: #5C564B;
-  --brass: #9C7A3C;
-  --navy: #1F3350;
-  --header-w: 1100px;
-  --content-w: 920px;
-  --footer-w: 1100px;
-}
 
 * {
   box-sizing: border-box;
@@ -185,16 +174,7 @@ body {
   opacity: 0.35;
 }
 
-// .hero-mark-math {
-//   margin: 2rem 0 2.2rem;
-//   padding: 1.1rem 1.35rem;
-//   border-left: 2px solid var(--brass);
-//   background: rgba(156, 122, 60, 0.045);
-//   font-family: 'IBM Plex Mono', monospace;
-//   font-size: 0.9rem;
-//   color: var(--ink-soft);
-//   overflow-x: auto;
-// }
+
 
 mjx-container[display="true"] {
   margin: 1.6em 0 !important;
@@ -277,6 +257,16 @@ button:focus-visible {
   }
 
   .content-wrap {
+    padding: 2.2rem 1.2rem 4rem;
+  }
+
+  /*
+     Same specificity (two classes) as the desktop rule in
+     .content-wrap.content-wrap--wide above — this is the fix.
+     Without matching specificity, that rule's `padding: 0 0 6rem`
+     silently wins on mobile regardless of source order.
+  */
+  .content-wrap.content-wrap--wide {
     padding: 2.2rem 1.2rem 4rem;
   }
 

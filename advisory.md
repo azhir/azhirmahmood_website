@@ -1,7 +1,8 @@
 ---
-layout: profile
+layout: default
 title: Advisory
 permalink: /advisory/
+wide: true
 ---
 
 <div class="page">
