@@ -51,6 +51,27 @@
   white-space: nowrap;
 }
 
+// .post-tag {
+//   font-family: 'IBM Plex Mono', monospace;
+//   font-size: 0.62rem;
+//   letter-spacing: 0.04em;
+//   text-transform: uppercase;
+//   color: var(--brass);
+//   opacity: 0.55;
+//   white-space: nowrap;
+// }
+
+// .post-level {
+//   margin: 0.2em 0 0;
+//   font-family: 'IBM Plex Mono', monospace;
+//   font-size: 0.68rem;
+//   letter-spacing: 0.04em;
+//   text-transform: uppercase;
+//   color: var(--navy);
+//   opacity: 0.55;
+// }
+
+
 .post-tag {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.62rem;
@@ -60,6 +81,26 @@
   opacity: 0.55;
   white-space: nowrap;
 }
+
+.post-tag--level {
+  color: var(--ink-soft);
+//   font-style: italic;
+  font-size: 0.58rem;
+}
+
+.post-level {
+  margin: 0.2em 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+//   font-style: italic;
+  opacity: 0.7;
+}
+
+
+
 
 .post-card {
   position: relative;
@@ -199,10 +240,10 @@
   font-weight: 600;
   font-size: clamp(1.8rem, 6vw, 2.8rem);
   line-height: 1.15;
-//   text-decoration: underline;
-//   text-underline-offset: 3px;
-//   text-decoration-thickness: 1px;
-//   text-decoration-color: rgba(156, 122, 60, 0.35);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(156, 122, 60, 0.35);
 }
 
 /* ==========================================================

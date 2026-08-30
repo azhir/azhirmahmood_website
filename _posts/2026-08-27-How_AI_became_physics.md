@@ -1,14 +1,12 @@
 ---
-
 title: "How AI Became the New Physics"
 date: 2026-08-27
-category: "Artificial Intelligence"
 
 abstract: >
   Why understanding modern AI is starting to resemble the study
   of complex physical systems.
 
-image: /assets/images/posts/ai-new-physics.jpg
+image: https://upload.wikimedia.org/wikipedia/commons/6/6e/Solvay_conference_1927.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original
 image_alt: "The 1927 Solvay Conference"
 
 tags:
@@ -16,8 +14,7 @@ tags:
   - machine-learning
   - science
 
-image: https://upload.wikimedia.org/wikipedia/commons/6/6e/Solvay_conference_1927.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original
-image_alt: "The 1927 Solvay Conference"
+level: technical
 
 published: true
 ---
