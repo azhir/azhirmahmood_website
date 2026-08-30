@@ -12,10 +12,10 @@ layout: default
 
   {% if page.image %}
   <div class="post-hero-image">
-    <img
+    <!-- <img
       src="{% if page.image contains '://' %}{{ page.image }}{% else %}{{ page.image | relative_url }}{% endif %}"
       alt="{{ page.image_alt | default: page.title }}"
-    >
+    > -->
   </div>
   {% endif %}
 
