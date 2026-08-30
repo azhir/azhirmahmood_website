@@ -1,0 +1,154 @@
+/* ==========================================================
+   MEDIA FRAME — reusable cropped image component
+
+   A responsive image frame with focal-point cropping. Used
+   inside .split (see _split-layout.scss) but self-contained —
+   drop .media > .img anywhere an image needs this crop/frame
+   treatment, split layout or not.
+   ========================================================== */
+
+.media {
+  position: relative;
+
+  width: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+
+/* --------------------------------------------------------
+   MAIN / START IMAGE
+
+   Opening / primary image. Gives it the tall desktop
+   treatment.
+   -------------------------------------------------------- */
+
+.media-main {
+  min-height: 850px;
+}
+
+
+/* --------------------------------------------------------
+   OPTIONAL MOBILE HIDING
+
+   Add class="media media-hide-mobile" to secondary/
+   decorative images you don't want on mobile.
+   -------------------------------------------------------- */
+
+.media-hide-mobile {
+  display: block;
+}
+
+
+/* ==========================================================
+   IMAGE
+   ========================================================== */
+
+.img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  max-width: none;
+
+  object-fit: cover;
+
+  /*
+     CROP / FOCAL POSITION
+
+     horizontal vertical
+
+     50% 50% = centre
+     40% 50% = more left
+     60% 50% = more right
+     50% 40% = more top
+     50% 70% = more bottom
+  */
+  object-position: 50% 65%;
+
+  /*
+     Optional extra zoom / crop.
+  */
+  transform: scale(1);
+
+  transform-origin: center center;
+}
+
+
+/* --------------------------------------------------------
+   MAIN IMAGE-SPECIFIC CONTROL
+   -------------------------------------------------------- */
+
+.img-main {
+  min-height: 850px;
+  object-position: 50% 65%;
+}
+
+
+/* ==========================================================
+   IMAGE ABOVE / TEXT BELOW (used with .split-stack)
+   ========================================================== */
+
+.split-stack .media {
+  width: min(100%, 700px);
+  margin: 0 auto 2rem;
+}
+
+.split-stack .img {
+  width: 100%;
+  height: auto;
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+  .media-main {
+    width: 100%;
+    min-height: 0;
+
+    margin-bottom: 1.5rem;
+  }
+
+  .media-main .img {
+    width: 100%;
+
+    height: 360px;
+    min-height: 0;
+
+    object-fit: cover;
+
+    /*
+       Independent mobile crop.
+    */
+    object-position: 50% 55%;
+
+    transform: scale(1);
+  }
+
+  .media-hide-mobile {
+    display: none;
+  }
+
+  /*
+     Normal secondary images (not the main hero, not
+     explicitly hidden) become ordinary full-width images
+     on mobile.
+  */
+  .split .media:not(.media-main):not(.media-hide-mobile) {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .split .media:not(.media-main):not(.media-hide-mobile) .img {
+    width: 100%;
+    height: auto;
+  }
+}

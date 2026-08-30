@@ -1,0 +1,102 @@
+/* ==========================================================
+   SPLIT LAYOUT — reusable two-column page grid
+
+   Generic layout plumbing for any media+text split page
+   (Advisory, About, case studies, profiles, etc). Contains
+   no content-specific styling — pairs with the .media/.img
+   component in _media-frame.scss for the actual imagery.
+   ========================================================== */
+
+.page {
+  width: 100%;
+  margin: 0;
+}
+
+
+/* ==========================================================
+   SPLIT SECTIONS
+   ========================================================== */
+
+.split {
+  display: grid;
+  width: 100%;
+  gap: 2rem;
+  align-items: stretch;
+}
+
+
+/* IMAGE LEFT */
+.split-left {
+  grid-template-columns:
+    minmax(0, 450px)
+    minmax(0, 1fr);
+}
+
+
+/* IMAGE RIGHT */
+.split-right {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 450px);
+}
+
+
+/* IMAGE ABOVE / TEXT BELOW */
+.split-stack {
+  display: block;
+}
+
+
+/* ==========================================================
+   TEXT COLUMN
+   ========================================================== */
+
+.copy {
+  min-width: 0;
+}
+
+.copy > :first-child {
+  margin-top: 0;
+}
+
+.copy p {
+  line-height: 1.65;
+}
+
+
+/* ==========================================================
+   SEPARATE SECTION
+   ========================================================== */
+
+.section {
+  width: 100%;
+
+  margin-top: 5rem;
+  padding-top: 3rem;
+
+  border-top: 1px solid var(--paper-line);
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+  .split,
+  .split-left,
+  .split-right {
+    display: block;
+    width: 100%;
+  }
+
+  .copy {
+    width: 100%;
+  }
+
+  .section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}
