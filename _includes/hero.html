@@ -1,59 +1,43 @@
 <!--
   HERO BLOCK — the framed box on the homepage that replaced the old
   LaTeX "welcome" formula. Sits above the post list. Included from
-  index.html via an include tag.
+  index.html using an include tag.
 -->
-  
+
 <div class="hero-mark-plain">
   <div class="hero-mark-inner">
 
     <!--
       CORNER BRACKETS (x4)
-      Each corner: 3 nested L's (stepped, fading opacity) + 2 short
-      ticks bridging the gap between the middle and inner L + 1 small
-      rotated square ("diamond") sitting inside the innermost L.
+      3 nested L's (stepped, fading opacity) + 2 short ticks bridging
+      the gap between the middle and inner L + 1 small rotated square
+      ("diamond") sitting inside the innermost L.
 
-      All 4 corners use IDENTICAL coordinates — they are mirrored into
-      position with CSS transforms in _hero.scss, not redrawn or
-      rotated. currentColor means they inherit color from .hero-corner
-      in the SCSS (var(--brass)).
+      viewBox is fixed at 0 0 40 40 — every coordinate below is a
+      proportion of that 40x40 space. One shape, captured once,
+      stamped into all four corners via a loop. Orientation (which
+      way each corner faces) is handled entirely by CSS mirroring in
+      _hero.scss — the numbers here never change per corner.
+
+      To resize the WHOLE bracket, change --corner-size in
+      _hero.scss. Do not add width/height to this <svg> tag directly
+      — that would override the CSS variable and break scaling.
     -->
+    {% capture corner_svg %}
+      <path d="M2,30 L2,2 L30,2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
+      <path d="M8,22 L8,8 L22,8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
+      <!-- <path d="M14,20 L14,14 L20,14" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.35"/> -->
+      <line x1="2" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+      <line x1="16" y1="2" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+      <rect x="13" y="13" width="6" height="6" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5" transform="rotate(45 16 16)"/>
+    {% endcapture %}
 
-<svg class="hero-corner hero-corner--tl" viewBox="0 0 40 40" aria-hidden="true">
-  <path d="M2,30 L2,2 L30,2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
-  <path d="M8,22 L8,8 L22,8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
-  <path d="M14,20 L14,14 L20,14" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.35"/>
-  <line x1="2" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <line x1="16" y1="2" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <rect x="13" y="13" width="6" height="6" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5" transform="rotate(45 16 16)"/>
-</svg>
-<svg class="hero-corner hero-corner--tr" viewBox="0 0 40 40" aria-hidden="true">
-  <path d="M2,30 L2,2 L30,2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
-  <path d="M8,22 L8,8 L22,8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
-  <path d="M14,20 L14,14 L20,14" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.35"/>
-  <line x1="2" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <line x1="16" y1="2" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <rect x="13" y="13" width="6" height="6" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5" transform="rotate(45 16 16)"/>
-</svg>
-<svg class="hero-corner hero-corner--bl" viewBox="0 0 40 40" aria-hidden="true">
-  <path d="M2,30 L2,2 L30,2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
-  <path d="M8,22 L8,8 L22,8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
-  <path d="M14,20 L14,14 L20,14" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.35"/>
-  <line x1="2" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <line x1="16" y1="2" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <rect x="13" y="13" width="6" height="6" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5" transform="rotate(45 16 16)"/>
-</svg>
-<svg class="hero-corner hero-corner--br" viewBox="0 0 40 40" aria-hidden="true">
-  <path d="M2,30 L2,2 L30,2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.9"/>
-  <path d="M8,22 L8,8 L22,8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.55"/>
-  <path d="M14,20 L14,14 L20,14" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.35"/>
-  <line x1="2" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <line x1="16" y1="2" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.7"/>
-  <rect x="13" y="13" width="6" height="6" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.5" transform="rotate(45 16 16)"/>
-</svg>
-
-
-
+    {% assign corners = "tl,tr,bl,br" | split: "," %}
+    {% for corner in corners %}
+    <svg class="hero-corner hero-corner--{{ corner }}" viewBox="0 0 40 40" aria-hidden="true">
+      {{ corner_svg }}
+    </svg>
+    {% endfor %}
 
     <!-- CENTRAL SIGIL -->
     <svg class="hero-sigil" viewBox="0 0 100 100" aria-hidden="true">

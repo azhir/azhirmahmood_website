@@ -20,14 +20,8 @@
   color:var(--brass);
 }
 
-// ----------------------------------------------------------
-// CORNER SIZE CONTROL
-// This is the ONLY number you should need to change to resize
-// the corner brackets. Everything inside each corner's SVG scales
-// together proportionally because the viewBox is fixed at 100x100.
-// ----------------------------------------------------------
 :root{
-  --corner-size: 34px;
+  --corner-size: 40px;
 }
 
 .hero-corner{
