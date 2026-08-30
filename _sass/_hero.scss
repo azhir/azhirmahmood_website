@@ -22,14 +22,14 @@
 
 .hero-corner{
   position:absolute;
-  width:20px;
-  height:20px;
+  width:34px;
+  height:34px;
   color:var(--brass);
 }
-.hero-corner--tl{ top:6px; left:6px; }
-.hero-corner--tr{ top:6px; right:6px; transform:scaleX(-1); }
-.hero-corner--bl{ bottom:6px; left:6px; transform:scaleY(-1); }
-.hero-corner--br{ bottom:6px; right:6px; transform:scale(-1,-1); }
+.hero-corner--tl{ top:4px; left:4px; }
+.hero-corner--tr{ top:4px; right:4px; transform:scaleX(-1); }
+.hero-corner--bl{ bottom:4px; left:4px; transform:scaleY(-1); }
+.hero-corner--br{ bottom:4px; right:4px; transform:scale(-1,-1); }
 
 .hero-sigil{
   display:block;

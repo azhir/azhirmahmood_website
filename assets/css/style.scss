@@ -185,16 +185,16 @@ body {
   opacity: 0.35;
 }
 
-.hero-mark-math {
-  margin: 2rem 0 2.2rem;
-  padding: 1.1rem 1.35rem;
-  border-left: 2px solid var(--brass);
-  background: rgba(156, 122, 60, 0.045);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
-  overflow-x: auto;
-}
+// .hero-mark-math {
+//   margin: 2rem 0 2.2rem;
+//   padding: 1.1rem 1.35rem;
+//   border-left: 2px solid var(--brass);
+//   background: rgba(156, 122, 60, 0.045);
+//   font-family: 'IBM Plex Mono', monospace;
+//   font-size: 0.9rem;
+//   color: var(--ink-soft);
+//   overflow-x: auto;
+// }
 
 mjx-container[display="true"] {
   margin: 1.6em 0 !important;
