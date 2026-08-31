@@ -1,38 +1,86 @@
 .page-eyebrow {
   margin: 0 0 0.5rem;
+
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+
   color: var(--brass);
   opacity: 0.85;
 }
 
+
+/* ==========================================================
+   ABOUT / ADVISORY TYPOGRAPHY
+   ========================================================== */
+
 .page-header h1,
 .copy > h1 {
   margin: 0;
+
   font-family: 'Fraunces', Georgia, serif;
   font-style: italic;
   font-weight: 500;
   font-size: 2rem;
+
   color: var(--ink);
 }
+
+.page .copy h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.6rem;
+
+  color: var(--ink);
+}
+
+.page .copy h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.25rem;
+
+  color: var(--ink);
+}
+
+/*
+   Bold text stays in the normal body font.
+*/
+.page .copy strong {
+  font-family: inherit;
+  font-weight: 600;
+}
+
 
 .page-header h1::after,
 .copy > h1::after {
   content: "";
+
   display: block;
+
   width: 44px;
   height: 2px;
-  margin-top: 0.7rem;
+
+  margin-top: 0.4rem;
+
   background: var(--brass);
 }
 
+
+/* ==========================================================
+   PLATES
+   ========================================================== */
+
 .media.framed {
   position: relative;
+
   overflow: hidden;
+
   aspect-ratio: 3 / 4;
   min-height: 0;
+
   border: 1px solid var(--brass);
 }
 
@@ -43,36 +91,62 @@
 .media.framed img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
   object-position: center;
 }
 
 .frame-corner {
   position: absolute;
+
   width: 24px;
   height: 24px;
+
   color: var(--paper);
+
   pointer-events: none;
+
   z-index: 2;
 }
-.frame-corner--tl { top: 4px; left: 4px; }
-.frame-corner--br { bottom: 4px; right: 4px; transform: scale(-1, -1); }
 
-.plate-duotone       { filter: url(#duotone-ink-paper) contrast(1.05); }
-.plate-duotone--brass { filter: url(#duotone-brass-paper) contrast(1.05); }
+.frame-corner--tl {
+  top: 4px;
+  left: 4px;
+}
+
+.frame-corner--br {
+  bottom: 4px;
+  right: 4px;
+
+  transform: scale(-1, -1);
+}
+
+.plate-duotone {
+  filter: url(#duotone-ink-paper) contrast(1.05);
+}
+
+.plate-duotone--brass {
+  filter: url(#duotone-brass-paper) contrast(1.05);
+}
 
 
+/* ==========================================================
+   MOBILE HERO PLATES
+   ========================================================== */
 
 @media (max-width: 900px) {
+
   .page-hero-plate {
     height: 120px;
     min-height: 0;
+
     aspect-ratio: auto;
   }
 
   .page-hero-plate img {
     width: 100%;
     height: 300px;
+
     object-fit: cover;
   }
 
