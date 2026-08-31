@@ -60,3 +60,23 @@
 
 .plate-duotone       { filter: url(#duotone-ink-paper) contrast(1.05); }
 .plate-duotone--brass { filter: url(#duotone-brass-paper) contrast(1.05); }
+
+
+
+@media (max-width: 900px) {
+  .page-hero-plate {
+    height: 120px;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  // .page-hero-plate--about img {
+  //   object-position: 50% 35%;
+  // }
+
+  // .page-hero-plate--advisory img {
+  //   object-position: 10% 60%;
+  // }
+
+
+}

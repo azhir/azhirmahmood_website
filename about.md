@@ -11,7 +11,7 @@ wide: true
 
 <div class="split split-left">
 
-  <div class="media media-main framed wide">
+  <div class="media media-main framed wide  page-hero-plate">
     <svg class="frame-corner frame-corner--tl" viewBox="0 0 40 40" aria-hidden="true">
       <path d="M2,20 L2,2 L20,2" fill="none" stroke="currentColor" stroke-width="1.6"/>
     </svg>
