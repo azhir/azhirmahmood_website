@@ -230,7 +230,7 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
   .site-header-inner {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -258,7 +258,7 @@ button:focus-visible {
   }
 
   .content-wrap {
-    padding: 2.2rem 1.2rem 4rem;
+    padding: 0.8rem 1.2rem 4rem;
   }
 
   /*
@@ -268,7 +268,7 @@ button:focus-visible {
      silently wins on mobile regardless of source order.
   */
   .content-wrap.content-wrap--wide {
-    padding: 2.2rem 1.2rem 4rem;
+    padding: 0.8rem 1.2rem 4rem;
   }
 
   .footer-wrap {
