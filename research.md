@@ -7,7 +7,7 @@ wide: true
 
 <div class="page">
 
-<p class="page-eyebrow">Research &middot; AI4Science &amp; Physical Systems</p>
+<p class="page-eyebrow">Research &middot; Inverse Problems, Optimization &amp; Physical AI </p>
 
 <div class="split split-left">
 
