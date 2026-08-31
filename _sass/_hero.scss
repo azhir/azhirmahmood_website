@@ -86,3 +86,14 @@
     margin-right: 2.0rem;
   }
 }
+
+@media (max-width: 650px) {
+  .hero-mark-plain {
+    margin-top: 0;
+  }
+
+  .hero-couplet,
+  .hero-attribution {
+    display: none;
+  }
+}

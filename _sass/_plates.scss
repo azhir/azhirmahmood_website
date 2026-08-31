@@ -70,13 +70,18 @@
     aspect-ratio: auto;
   }
 
-  // .page-hero-plate--about img {
-  //   object-position: 50% 35%;
-  // }
+  .page-hero-plate img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
 
-  // .page-hero-plate--advisory img {
-  //   object-position: 10% 60%;
-  // }
+  .page-hero-plate--about img {
+    object-position: 50% 40%;
+  }
 
+  .page-hero-plate--advisory img {
+    transform: translateY(-35px);
+  }
 
 }
