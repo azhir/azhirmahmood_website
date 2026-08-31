@@ -1,7 +1,8 @@
 ---
-layout: profile
+layout: default
 title: About
 permalink: /about/
+wide: true
 ---
 
 <div class="page">
