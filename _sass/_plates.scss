@@ -1,0 +1,62 @@
+.page-eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+  opacity: 0.85;
+}
+
+.page-header h1,
+.copy > h1 {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 2rem;
+  color: var(--ink);
+}
+
+.page-header h1::after,
+.copy > h1::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin-top: 0.7rem;
+  background: var(--brass);
+}
+
+.media.framed {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  min-height: 0;
+  border: 1px solid var(--brass);
+}
+
+.media.framed.wide {
+  aspect-ratio: 4 / 3;
+}
+
+.media.framed img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.frame-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  color: var(--paper);
+  pointer-events: none;
+  z-index: 2;
+}
+.frame-corner--tl { top: 4px; left: 4px; }
+.frame-corner--br { bottom: 4px; right: 4px; transform: scale(-1, -1); }
+
+.plate-duotone       { filter: url(#duotone-ink-paper) contrast(1.05); }
+.plate-duotone--brass { filter: url(#duotone-brass-paper) contrast(1.05); }

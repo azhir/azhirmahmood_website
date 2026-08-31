@@ -7,17 +7,21 @@ wide: true
 
 <div class="page">
 
+<p class="page-eyebrow">Advisory &middot; Deep-tech &amp; AI</p>
+
 <div class="split split-left">
 
-  <div class="media media-main">
+  <div class="media media-main framed wide">
+    <svg class="frame-corner frame-corner--tl" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M2,20 L2,2 L20,2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+    <svg class="frame-corner frame-corner--br" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M2,20 L2,2 L20,2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
     <img
-      class="img img-main"
-      src="https://images.pdimagearchive.org/essays/the-cats-meat-man/wain-cat-1.jpg"
-      alt="Illustration"
-      style="
-        object-position: 42% 68%; 
-        transform: scale(1.08);
-        "
+      class="plate-duotone--brass"
+      src="{{ '/assets/images/plates/left_astro.jpg' | relative_url }}"
+      alt="Detail of a 17th-century celestial hemisphere chart"
     >
   </div>
 
@@ -48,25 +52,31 @@ I am most useful when the problem sits across technology, capital and company st
 
 ## Where I work
 
-**Company strategy**  
+**Company strategy**
 Choosing the market, product and technical bets that determine the next stage of the company.
 
-**Fundraising & investor strategy**  
+**Fundraising & investor strategy**
 Round sizing, narrative, investor positioning, targeting and preparation for consequential raises.
 
-**Research → product**  
+**Research → product**
 Turning differentiated technical capability into a product, roadmap and commercial proposition.
 
-**Technical organisation**  
+**Technical organisation**
 Building research and technical functions that can move from early experimentation to a scalable company.
 
   </div>
 
-  <div class="media media-hide-mobile">
+  <div class="media media-hide-mobile framed wide">
+    <svg class="frame-corner frame-corner--tl" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M2,20 L2,2 L20,2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+    <svg class="frame-corner frame-corner--br" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M2,20 L2,2 L20,2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
     <img
-      class="img"
-      src="https://images.pdimagearchive.org/collections/hi-res-images-from-the-apollo-missions/21963930856_66e9be4b16_o.jpg"
-      alt="Apollo mission photograph"
+      class="plate-duotone--brass"
+      src="{{ '/assets/images/plates/right_astro.jpg' | relative_url }}"
+      alt="Detail of a cherub cartouche from a historical star atlas"
     >
   </div>
 
