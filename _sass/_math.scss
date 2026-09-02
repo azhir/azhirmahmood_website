@@ -1,0 +1,184 @@
+// _math.scss
+// Reusable mathematical environments for Jekyll posts.
+//
+// Suggested usage:
+//   <div class="math-box definition">
+//     <div class="math-box__title">Definition — Lipschitz continuity</div>
+//     ...
+//   </div>
+//
+// Import from your main SCSS with:
+//   @use "math";
+// or, for older Jekyll/Sass setups:
+//   @import "math";
+
+:root {
+  // Neutral surfaces
+  --math-surface: #fbfaf7;
+  --math-text: #262626;
+  --math-muted: #6f6b63;
+  --math-border: #ddd8cf;
+
+  // A restrained, slightly astronomical / alchemical palette
+  --math-definition: #4f5f8f;  // muted indigo
+  --math-theorem: #386b67;     // deep teal
+  --math-example: #9a6a3a;     // warm ochre
+  --math-remark: #78658a;      // muted violet
+  --math-proof: #727272;       // neutral graphite
+
+  // Very pale tints used as box backgrounds
+  --math-definition-bg: #f3f4f9;
+  --math-theorem-bg: #f1f7f5;
+  --math-example-bg: #faf5ee;
+  --math-remark-bg: #f6f2f8;
+  --math-proof-bg: #f6f6f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --math-surface: #171717;
+    --math-text: #eeeeec;
+    --math-muted: #aaa69d;
+    --math-border: #373531;
+
+    --math-definition: #9ca9d6;
+    --math-theorem: #8abbb4;
+    --math-example: #d1a06b;
+    --math-remark: #b7a3c9;
+    --math-proof: #aaa9a5;
+
+    --math-definition-bg: #1d2029;
+    --math-theorem-bg: #192421;
+    --math-example-bg: #282119;
+    --math-remark-bg: #241e29;
+    --math-proof-bg: #20201f;
+  }
+}
+
+.math-box {
+  --math-accent: var(--math-definition);
+  --math-box-bg: var(--math-definition-bg);
+
+  position: relative;
+  margin: 1.75rem 0;
+  padding: 1rem 1.15rem 1.05rem 1.2rem;
+
+  color: var(--math-text);
+  background: var(--math-box-bg);
+
+  border: 1px solid var(--math-border);
+  border-left: 4px solid var(--math-accent);
+  border-radius: 0.5rem;
+
+  // Keep display maths from feeling cramped inside a box.
+  .MathJax_Display,
+  mjx-container[display="true"] {
+    margin: 0.9rem 0 !important;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  p {
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+}
+
+.math-box__title {
+  margin-bottom: 0.55rem;
+  color: var(--math-accent);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.math-box__label {
+  font-variant: small-caps;
+  letter-spacing: 0.055em;
+}
+
+// --- Environments ---------------------------------------------------------
+
+.math-box.definition {
+  --math-accent: var(--math-definition);
+  --math-box-bg: var(--math-definition-bg);
+}
+
+.math-box.theorem,
+.math-box.lemma,
+.math-box.proposition,
+.math-box.corollary {
+  --math-accent: var(--math-theorem);
+  --math-box-bg: var(--math-theorem-bg);
+}
+
+.math-box.example {
+  --math-accent: var(--math-example);
+  --math-box-bg: var(--math-example-bg);
+}
+
+.math-box.remark,
+.math-box.note {
+  --math-accent: var(--math-remark);
+  --math-box-bg: var(--math-remark-bg);
+}
+
+.math-box.proof {
+  --math-accent: var(--math-proof);
+  --math-box-bg: var(--math-proof-bg);
+
+  border-left-width: 2px;
+  font-size: 0.96em;
+}
+
+// Optional QED mark for proofs.
+.math-box.proof::after {
+  content: "□";
+  display: block;
+  margin-top: 0.65rem;
+  text-align: right;
+  color: var(--math-accent);
+}
+
+// --- Compact variant ------------------------------------------------------
+
+.math-box.compact {
+  padding-top: 0.8rem;
+  padding-bottom: 0.85rem;
+
+  .math-box__title {
+    margin-bottom: 0.35rem;
+  }
+}
+
+// --- Equation emphasis ----------------------------------------------------
+
+.math-equation {
+  margin: 1.25rem 0;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+
+  text-align: center;
+  background: var(--math-surface);
+  border: 1px solid var(--math-border);
+  border-radius: 0.45rem;
+}
+
+// A subtle inline definition / mathematical term.
+.math-term {
+  color: var(--math-definition);
+  font-weight: 600;
+}
+
+// Small explanatory annotation below an equation.
+.math-caption {
+  margin-top: -0.45rem;
+  color: var(--math-muted);
+  font-size: 0.88em;
+  text-align: center;
+}
